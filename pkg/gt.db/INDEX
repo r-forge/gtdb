@@ -1,0 +1,126 @@
+adjust.gt.calls         Manually Assign Genotype Calls
+apply.gt.dataset        Apply a Function to a Genotype Dataset
+apply.loadings          Apply PCA SNP Loadings to a New Genotype Set
+as.mask                 Convert To/From Character Masks
+assay.dat.01            Genotype Data for 5000 SNPs on 270 HapMap
+                        Samples
+assay.dat.02            Genotype Data for 371 Chr21 SNPs on 275 HapMap
+                        Samples
+big.loadings            Identify Large Sample or SNP Loadings from a
+                        PCA Analysis
+ch.table                Character Based Contingency Table
+fetch.gt.data           Load Genotype Data for a Genotyping Dataset
+fetch.prcomp            Load Principal Components Results for a
+                        Genotyping Dataset
+fetch.pt.data           Load Phenotype Data for a Genotype Dataset
+fetch.sample.data       Load Sample Data for a Genotype Dataset
+fetch.subject.data      Load Subject Data for a Genotyping Project
+fetch.test.scores       Load Association Test Results for a Genotyping
+                        Dataset
+gplot                   Genome-Wide Level Plot
+gplot.prcomp            Genome-Wide Level Plots of SNP Loadings from
+                        PCA
+gt.cluster.plot         Plot Genotype Cluster Data
+gt.dataset              Genotype Dataset Specification
+gt.dist                 Calculate Pairwise Genotype Distances
+gt.split                Convert between Packed Genotype Strings and
+                        Genotype Vectors
+hapmap.subjects         Data from the International HapMap Project
+hexToRaw                Convert between Raw Vectors and Hex Strings
+hwe.test                Tests for Hardy Weinberg Equilibrium
+ibd.dataset             Calculate Identity by Descent for a Genotype
+                        Dataset
+ibd.plot                Plot Identity by Descent Data
+ibd.summary             Summarize Identity by Descent Analysis Results
+ibs.gt.data             Calculate Pairwise Identity by State for
+                        Genotype Data
+if.na                   Conditional Element Selection for Missing
+                        Values
+jt.test                 Jonckheere-Terpstra Nonparametric Test for
+                        Trend
+keep.attr               Keep User Attributes
+ld.gt.data              Compute Pairwise Linkage Disequilibrium
+ld.plot                 Pairwise Linkage Disequilibrium Plot
+ld.prune                Prune SNP List to Limit Linkage Disequilibrium
+ls.assay                List Assay Definitions
+ls.assay.group          List Assay Groups
+ls.assay.position       List Assay Positions
+ls.dataset              List Genotype Datasets
+ls.mapping              List Assay Mapping Sets
+ls.platform             List Genotyping Platforms
+ls.prcomp               List Principal Components Result Sets
+ls.project              List Genotyping Projects
+ls.sample               List Samples in a Genotype Dataset
+ls.subject              List Subjects in a Genotyping Project
+ls.test                 List Association Test Result Sets
+mask.gt.data            Mask Sample Genotypes
+mask.str                Mask Character Strings
+match.gt.data           Identify Equivalent Genotyping Assays
+mk.assay                Create Genotyping Assay Definitions
+mk.assay.data           Create Genotyping Assay Data
+mk.assay.group          Create or Remove a Genotype Assay Group
+mk.assay.position       Create Genotyping Assay Positions
+mk.attr                 Create, Remove, and List Attribute Definitions
+mk.dataset              Create or Remove Genotype Datasets
+mk.mapping              Create or Remove a Mapping for a Genotyping
+                        Platform
+mk.platform             Create or Remove a Genotyping Platform
+mk.project              Create or Remove a Genotyping Project
+mk.sample               Create or Remove Dataset Samples
+mk.sample.attr          Create, Remove, or List Sample Attribute
+                        Definitions
+mk.subject              Create or Remove Project Subjects
+mk.subject.attr         Create, Remove, or List Subject Attribute
+                        Definitions
+na.if                   Conditional Conversion to Missing Values
+nsubstr                 Count Substring Instances
+nw.align                Needleman and Wunsch Sequence Alignment
+nw.orient.assay         Orient Assay Sequences
+orient.gt.data          Flip Assay Strands and/or Swap Alleles
+panel.cluster           Panel Function for Drawing Elliptical Cluster
+                        Boundaries
+panel.qqpval            Quantile-Quantile Plots for P Values: Panel
+                        Functions
+panel.qqthin            Sparse Normal Quantile-Quantile Plots: Panel
+                        Function
+prcomp.gt.data          Principal Components Analysis of Genotype Data
+progress.bar            Console Text-Based Progress Bar
+qqprcomp                Quantile-Quantile Plots of PCA Loadings
+qqpval                  Quantile-Quantile Plots for P Values
+qqthin                  Sparse Normal Quantile-Quantile Plots
+reshape.gt.data         Reshape Genotype Data
+revcomp                 Reverse Complement DNA Sequences
+score.and.store         Test SNPs for Association and Store Results
+score.chisq             Chi-Squared Test for Genotypic Association
+score.chisq.2x2         Chi-Squared Test for Allelic Association
+score.fisher            Fisher's Exact Test for Genotypic Association
+score.glm               Test for Association using Logistic Regression
+score.glm.general       Association Test with a Logistic Model and
+                        General Mode of Action
+score.glm.groups        Test for Association using a Logistic Model
+                        with Subgroup Effects
+score.gt.data           Test SNPs for Association
+score.jt                Jonckheere-Terpstra Nonparametric Test for
+                        Association
+score.kruskal           Kruskal-Wallis Nonparametric Test for
+                        Association
+score.lm                Test for Association using a Simple Linear
+                        Model
+score.lm.general        Test for Association using a Linear Model and
+                        General
+score.lm.groups         Test for Association using a Linear Model with
+                        Subgroup Effects
+score.prcomp            Test Phenotypic Association with Principal
+                        Components
+score.trend             Cochran-Armitage Trend Test for Association
+set.hidden              Update Hidden Status
+snp.loadings            SNP Loadings from Principal Components Analyses
+sql.query               Simplified SQL Statement Execution
+store.prcomp            Store or Remove Principal Components Results
+store.sample.data       Store Sample Data
+store.subject.data      Store Subject Data
+store.test.scores       Store or Remove Association Test Results
+summary.gt.data         Genotype Data Summary
+unpack.gt.matrix        Convert Packed Genotype Strings to a Genotype
+                        Matrix
+use.gt.db               Define GT.DB Database Connection
