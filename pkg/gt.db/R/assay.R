@@ -24,7 +24,7 @@ function(platform.name, show.all=FALSE, show.ids=FALSE)
 {
     sql <-
      'select mapping_id, name mapping_name, description,
-        is_hidden, created_by, created_dt
+        assembly, is_hidden, created_by, created_dt
       from mapping
       where platform_id=:1
         and is_hidden<=:2'
@@ -34,15 +34,16 @@ function(platform.name, show.all=FALSE, show.ids=FALSE)
 }
 
 mk.mapping <-
-function(platform.name, mapping.name, description, is.hidden=FALSE)
+function(platform.name, mapping.name, description,
+         assembly, is.hidden=FALSE)
 {
     .check.name(mapping.name)
     plat.id <- lookup.id('platform', platform.name)
     sql <-
      "insert into mapping
-      values (null, :1, :2, :3, :4, :user:, :sysdate:)"
+      values (null, :1, :2, :3, :4, :5, :user:, :sysdate:)"
     sql.exec(gt.db::.gt.db, sql, plat.id, mapping.name,
-             description, is.hidden)
+             description, assembly, is.hidden)
 }
 
 rm.mapping <- function(platform.name, mapping.name)
