@@ -69,10 +69,11 @@ use.gt.db <- function(dbConnection)
 init.gt.db <- function()
 {
     path <- library(help='gt.db')$path
-    if (class(gt.db::.gt.db)=='SQLiteConnection')
-        file <- paste(path, '/schema/sqlite.sql', sep='')
-    else if (class(gt.db::.gt.db)=='MySQLConnection')
-        file <- paste(path, '/exec/schema/mysql.sql', sep='')
+    schema <- switch(class(gt.db::.gt.db),
+                     SQLiteConnection='mk_sqlite.sql',
+                     MySQLConnection='mk_mysql.sql',
+                     OraConnection='mk_oracle.sql')
+    file <- paste(path, 'schema', $schema, sep='/')
     s <- scan(file, what='character', sep='&')
     s <- s[-grep('^--',s)]
     s <- strsplit(paste(s, collapse='\n'), ';\n')[[1]]
