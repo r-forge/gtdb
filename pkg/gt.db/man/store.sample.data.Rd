@@ -35,6 +35,9 @@ store.sample.data(dataset.name, data)
   Additional columns should supply values of sample attributes
   previously defined by \code{\link{mk.sample.attr}}.  Missing values
   are not explicitly recorded in the database.
+  
+  Columns with reserved names \code{"subject_name"}, \code{"gender"},
+  and \code{"position"} will be ignored.
 }
 \value{
   A vector of counts of rows inserted in the database for each column

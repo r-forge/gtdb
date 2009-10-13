@@ -131,8 +131,10 @@ function(dataset.name, cols, show.all=FALSE)
 store.sample.data <- function(dataset.name, data)
 {
     dset.id <- lookup.id('dataset', dataset.name)
-    sn <- data$sample.name ; data$sample.name <- NULL
-    samp.id <- lookup.id('sample', sn, dataset.id=dset.id)
+    samp.id <- lookup.id('sample', data$sample.name, dataset.id=dset.id)
+    for (n in c('sample.name','subject.name','gender','position')) {
+        data[n] <- NULL
+    }
     attr.id <- lookup.id('sample_attr', names(data), dataset.id=dset.id)
     sql <- 'insert into sample_value values (:1,:2,:3)'
     insert.column <- function(attr.id, col)
