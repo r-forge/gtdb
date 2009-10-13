@@ -195,7 +195,7 @@ create table sample
   dataset_id integer not null,
   subject_id integer not null,
   name varchar(255) not null,
-  gender char(1) not null,
+  gender char(1),
   position integer,
   constraint sample_uniq_1 unique (dataset_id, name),
   constraint sample_uniq_2 unique (dataset_id, position),
