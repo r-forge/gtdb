@@ -25,16 +25,21 @@
   table.
 }
 \usage{
-mk.mapping(platform.name, mapping.name, description, is.hidden=FALSE)
+mk.mapping(platform.name, mapping.name, description,
+           assembly, is.hidden=FALSE)
 rm.mapping(platform.name, mapping.name)
 }
 \arguments{
   \item{platform.name}{the unique platform identifier.}
   \item{mapping.name}{an identifier for the mapping.}
   \item{description}{a free-text description of the mapping.}
+  \item{assembly}{the target assembly for the mapping.  This is used to
+    determine whether two mappings have compatible coordinates.}
   \item{is.hidden}{logical: indicates if the mapping is hidden.}
 }
 \details{
+  A platform may have multiple mapping sets, for different assemblies,
+  or even for the same assembly with different alignment parameters.
   Removing a mapping results in deletion of all the associated assay
   map positions.
 }
@@ -49,7 +54,7 @@ rm.mapping(platform.name, mapping.name)
 }
 \examples{\dontrun{
 mk.platform('My_600K', 'My 600K Array Set')
-mk.mapping('My_600K', 'b36_1', 'Build 36 Vender Annotations')
+mk.mapping('My_600K', 'b36_1', 'Build 36 Vender Annotations', 'ncbi_b36')
 rm.mapping('My_600K', 'b36_1')
 rm.platform('My_600K')
 }}

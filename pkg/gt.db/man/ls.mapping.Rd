@@ -34,11 +34,12 @@ ls.mapping(platform.name, show.all=FALSE, show.ids=FALSE)
     database keys.}
 }
 \value{
-  A data frame with one row per mapping, and 4 or 5 columns:
+  A data frame with one row per mapping, and 5 or 6 columns:
   \item{mapping.id}{if \code{show.ids} is set: a unique integer key
     for this mapping.}
   \item{mapping}{a short, unique identifier for the mapping.}
   \item{description}{a free-text description of the mapping.}
+  \item{assembly}{a short identifier for the target assembly.}
   \item{created.by}{the user name that created the mapping.}
   \item{created.dt}{the creation date of the mapping.}
 }
