@@ -73,7 +73,7 @@ init.gt.db <- function()
                      SQLiteConnection='mk_sqlite.sql',
                      MySQLConnection='mk_mysql.sql',
                      OraConnection='mk_oracle.sql')
-    file <- paste(path, 'schema', $schema, sep='/')
+    file <- paste(path, 'schema', schema, sep='/')
     s <- scan(file, what='character', sep='&')
     s <- s[-grep('^--',s)]
     s <- strsplit(paste(s, collapse='\n'), ';\n')[[1]]
