@@ -54,8 +54,9 @@ ld.prune(gt.data, min.maf=0.01, max.rsqr=0.2, span=20, subsets=TRUE)
 \examples{
 gt.demo.check()
 gt <- fetch.gt.data('Demo_2')
-p <- fetch.subject.data('Demo')
-by.plate <- list(p$plate=='CEU', p$plate=='YRI', p$plate=='J+C')
+pt <- fetch.pt.data('Demo_2')
+by.plate <- list(pt$plate=='CEU', pt$plate=='YRI',
+                 pt$plate=='J+C' & !pt$is_dup)
 x <- ld.prune(gt, subsets=by.plate)
 nrow(gt)
 nrow(x)
