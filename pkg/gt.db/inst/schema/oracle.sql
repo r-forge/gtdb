@@ -78,6 +78,7 @@ create table mapping
   platform_id integer not null,
   name varchar(64) unique not null,
   description varchar(255),
+  assembly varchar(64),
   is_hidden integer,
   created_by varchar(64),
   created_dt date,
