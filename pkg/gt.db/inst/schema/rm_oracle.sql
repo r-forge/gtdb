@@ -43,6 +43,5 @@ drop table assay_position;
 drop table assay_position_flag;
 drop table mapping;
 drop table assay;
-drop table assay_flag;
 drop table assay_group;
 drop table platform;

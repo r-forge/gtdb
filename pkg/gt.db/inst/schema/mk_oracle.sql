@@ -160,7 +160,8 @@ create table subject
   project_id integer not null,
   name varchar(255) not null,
   constraint subject_uniq unique (project_id, name),
-  foreign key (project_id) references project(project_id)
+  foreign key (project_id)
+    references project(project_id) on delete cascade
 );
 
 create table subject_attr
@@ -175,7 +176,8 @@ create table subject_attr
   created_by varchar(64),
   created_dt date,
   constraint subject_attr_uniq unique (project_id, name),
-  foreign key (project_id) references project(project_id)
+  foreign key (project_id)
+    references project(project_id) on delete cascade
 );
 
 create table subject_value
@@ -200,7 +202,8 @@ create table sample
   position integer,
   constraint sample_uniq_1 unique (dataset_id, name),
   constraint sample_uniq_2 unique (dataset_id, position),
-  foreign key (dataset_id) references dataset(dataset_id),
+  foreign key (dataset_id)
+    references dataset(dataset_id) on delete cascade,
   foreign key (subject_id) references subject(subject_id)
 );
 
@@ -216,7 +219,8 @@ create table sample_attr
   created_by varchar(64),
   created_dt date,
   constraint sample_attr_uniq unique (dataset_id, name),
-  foreign key (dataset_id) references dataset(dataset_id)
+  foreign key (dataset_id)
+    references dataset(dataset_id) on delete cascade
 );
 
 create table sample_value
@@ -259,7 +263,8 @@ create table assay_data
   qscore blob,
   raw_data blob,
   constraint assay_data_uniq unique (dataset_id, assay_id),
-  foreign key (dataset_id) references dataset(dataset_id),
+  foreign key (dataset_id)
+    references dataset(dataset_id) on delete cascade,
   foreign key (assay_id) references assay(assay_id)
 );
 
