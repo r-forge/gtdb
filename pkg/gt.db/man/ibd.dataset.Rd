@@ -39,55 +39,16 @@ ibd.dataset(dataset.name, binsz=1e6, part=1, parts=10,
   \item{\dots}{additional arguments for \code{\link{ibd.gt.data}}.}
 }
 \details{
-  Pairwise identity-by-descent (IBD) is estimated using data from a
-  series of intervals of size \code{binsz}, equally spaced across the
-  genome.  The algorithm determines the minimum number of alleles
-  identical by state (IBS) for SNPs within each bin, and averages
-  these values across bins.  The minimum IBS value gives an upper
-  limit on IBD for that bin, and approaches IBD as the number of
-  assayed SNPs increases.
-
-  Determining IBD for close relatives requires only a fraction of the
-  available data from a whole genome scan.  Very accurate estimates of
-  IBD are not particularly useful, because of intrinsic variability in
-  the recombination process.  The default values for \code{binsz},
-  \code{part}, and \code{parts} should not need to be changed.
-
-  Bins with few SNPs may not be sufficiently informative for IBD, if
-  there is a substantial probability of unrelated samples sharing the
-  same haplotype by chance.  Rare genotyping errors can also impact
-  apparent IBD, since a single error within a bin will change the
-  minimum IBS.  The \code{min.snps} setting ensures reasonable
-  informativeness, and \code{max.snps}, \code{maf.min},
-  \code{hw.p.min}, and \code{gt.rate.min} control the expected error
-  rate.
-
-  The estimated genomic proportion with IBD=1 is biased upwards
-  because a small proportion of bins are not sufficiently informative
-  to distinguish IBD=0 from IBD=1.  The estimate for IBD=2 seems to
-  be less biased.  The following table shows expected genomic IBD
-  proportions for common familial relationships.
-
-  \tabular{cccl}{
-   IBD=0 \tab IBD=1 \tab IBD=2 \tab Relationship \cr
-   1.00 \tab 0.00 \tab 0.00 \tab unrelated \cr
-   0.75 \tab 0.25 \tab 0.00 \tab first cousins \cr
-   0.50 \tab 0.50 \tab 0.00 \tab half siblings \cr
-   0.00 \tab 1.00 \tab 0.00 \tab parent-child \cr
-   0.25 \tab 0.50 \tab 0.25 \tab full siblings \cr
-   0.00 \tab 0.00 \tab 1.00 \tab duplicate samples \cr
-  }
-
-  It is important to note that the actual IBD proportions for most
-  relative pairs (except for parent-child) show substantial natural
-  variation, independent of the variation due to the estimation
-  procedure.
+  This is a wrapper around \code{\link{ibd.gt.data}} that helps to
+  select a suitable genome-wide autosomal subset of a genotype dataset
+  for IBD analysis.  The \code{maf.min}, \code{hw.p.min}, and
+  \code{gt.rate.min} filters improve the IBD estimates by excluding
+  problematic data that may have elevated error rates.
 }
 \value{
-  A list with three elements.  The first two elements are matrices,
-  containing the estimated proportions of the genome with IBD=1 and
-  IBD=2, for all pairs of samples in the dataset.  The third element
-  is an ordered list of sample names from the GTPUB dataset.
+  A list of two square matrices with row and column names set to sample
+  names in the input data, containing the estimated proportions of the
+  genome with IBD=1 and IBD=2, for all pairs of samples in the dataset.
 }
 \seealso{
   \code{\link{ibd.plot}},

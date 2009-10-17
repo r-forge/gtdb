@@ -61,6 +61,10 @@ function(gt.data, binsz=1e6, min.snps=25, max.snps=50,
 {
     nc <- max(nchar(gt.data$genotype))
     m0 <- m1 <- m2 <- matrix(0, nc, nc)
+    if (any(gt.data$ploidy != 'A')) {
+        gt.data <- subset(gt.data, ploidy=='A')
+        warning('non-autosomal data will be excluded')
+    }
 
     # remove outlier samples
     gt <- with(summary.gt.data(gt.data, by.sample=TRUE), AA+AB+BB)
@@ -119,6 +123,7 @@ function(dataset.name, binsz=1e6, part=1, parts=10,
 {
     g <- fetch.gt.data(dataset.name, part=part, parts=parts,
                        by='position', binsz=binsz)
+    g <- subset(g, ploidy=='A')
     g <- with(summary.gt.data(g), subset(g, gt.rate>=gt.rate.min &
               pmin(freq.a,freq.b)>=maf.min & hw.p.value>=hw.p.min))
     ibd.gt.data(g, binsz=binsz, ...)
