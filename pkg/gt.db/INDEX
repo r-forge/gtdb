@@ -22,20 +22,25 @@ gplot.prcomp            Genome-Wide Level Plots of SNP Loadings from
                         PCA
 gt.cluster.plot         Plot Genotype Cluster Data
 gt.dataset              Genotype Dataset Specification
+gt.demo.check           Check for Presence of GT.DB Demo Datasets
 gt.dist                 Calculate Pairwise Genotype Distances
 gt.split                Convert between Packed Genotype Strings and
                         Genotype Vectors
-hapmap.subjects         Data from the International HapMap Project
+hapmap.subjects         Subject Data from the International HapMap
+                        Project
 hexToRaw                Convert between Raw Vectors and Hex Strings
 hwe.test                Tests for Hardy Weinberg Equilibrium
 ibd.dataset             Calculate Identity by Descent for a Genotype
                         Dataset
+ibd.gt.data             Estimate Pairwise Identity by Descent for
+                        Genotype Data
 ibd.plot                Plot Identity by Descent Data
 ibd.summary             Summarize Identity by Descent Analysis Results
 ibs.gt.data             Calculate Pairwise Identity by State for
                         Genotype Data
 if.na                   Conditional Element Selection for Missing
                         Values
+init.gt.db              Initialize GT.DB Database
 jt.test                 Jonckheere-Terpstra Nonparametric Test for
                         Trend
 keep.attr               Keep User Attributes
