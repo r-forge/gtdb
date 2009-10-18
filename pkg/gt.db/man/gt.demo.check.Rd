@@ -16,33 +16,26 @@
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see <http://www.gnu.org/licenses/>
 % 
-\name{use.gt.db}
-\alias{use.gt.db}
-\title{Define GT.DB Database Connection}
+\name{gt.demo.check}
+\alias{gt.demo.check}
+\title{Check for Presence of GT.DB Demo Datasets}
 \description{
-  Define a DBI connection to be used to access a GT.DB database.  This
-  connection is used implicitly by other GT.DB functions that interact
-  with the database.
+  This is used in many of the GT.DB examples to check for the presence
+  of the demo datasets.
 }
 \usage{
-use.gt.db(dbConnection)
+gt.demo.check()
 }
-\arguments{
-  \item{dbConnection}{a connection object from
-    \code{\link[DBI:dbConnect]{dbConnect}}.}
-}
-\value{
-  None.
+\details{
+  If the demo datasets are unavailable, then the example code is
+  terminated with an error message.  If invoked non-interactively (say,
+  from \code{R CMD CHECK}), then a temporary SQLite database is created
+  for the demo datasets.
 }
 \seealso{
-  \code{\link[DBI:dbDriver]{dbDriver}},
-  \code{\link[DBI:dbConnect]{dbConnect}},
-  \code{\link{init.gt.db}}.
+  \code{\link{init.gt.db}}, \code{\link{demo}(setup.gt.demo)}.
 }
-\examples{\dontrun{
-library(RSQLite)
-tmpname <- tempfile('db')
-gt.db <- dbConnect(dbDriver('SQLite'), tmpname)
-use.gt.db(gt.db)
-}}
+\examples{
+gt.demo.check()
+}
 \keyword{database}

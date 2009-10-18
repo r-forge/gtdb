@@ -19,15 +19,22 @@
 \name{hapmap}
 \docType{data}
 \alias{hapmap.subjects}
-\title{Data from the International HapMap Project}
+\title{Subject Data from the International HapMap Project}
 \description{
-  \code{hapmap.subjects} describes the sample plate and panel
-  membership, and parent/child relationships, for the 270 individuals
-  genotyped in the Phase I and Phase II HapMap Projects.
+  \code{hapmap.subjects} describes sample plate and panel membership,
+  and parent/child relationships, for the 1301 individuals genotyped in
+  the Phase II and Phase III HapMap Projects.
 }
 \usage{data(hapmap)}
 \source{The International HapMap Project}
 \references{
   The International HapMap Project. \url{http://www.hapmap.org}.
 }
+\seealso{
+  \code{\link{demo}(setup.hapmap)}.
+}
+\examples{\dontrun{
+# create HapMap project in GT.DB
+demo('setup.hapmap')
+}}
 \keyword{datasets}

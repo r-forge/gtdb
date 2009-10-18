@@ -42,4 +42,8 @@
 
   The International HapMap Project. \url{http://www.hapmap.org}.
 }
+\examples{\dontrun{
+# load demo datasets into GT.DB
+demo('setup.gt.demo')
+}}
 \keyword{datasets}

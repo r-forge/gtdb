@@ -16,33 +16,35 @@
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see <http://www.gnu.org/licenses/>
 % 
-\name{use.gt.db}
-\alias{use.gt.db}
-\title{Define GT.DB Database Connection}
+\name{init.gt.db}
+\alias{init.gt.db}
+\title{Initialize GT.DB Database}
 \description{
-  Define a DBI connection to be used to access a GT.DB database.  This
-  connection is used implicitly by other GT.DB functions that interact
-  with the database.
+  Create all the standard GT.DB database objects (tables, indexes) in an
+  empty database.
 }
 \usage{
-use.gt.db(dbConnection)
+init.gt.db()
 }
-\arguments{
-  \item{dbConnection}{a connection object from
-    \code{\link[DBI:dbConnect]{dbConnect}}.}
-}
-\value{
-  None.
+\details{
+  This should be called after connecting to a new database using
+  \code{\link[DBI:dbConnect]{dbConnect}} and \code{\link{use.gt.db}}.
+  Scripts for creating GT.DB tables and indexes are installed under
+  \code{library(help='gt.db')$path} in the \file{schema} subdirectory.
 }
 \seealso{
-  \code{\link[DBI:dbDriver]{dbDriver}},
   \code{\link[DBI:dbConnect]{dbConnect}},
-  \code{\link{init.gt.db}}.
+  \code{\link{use.gt.db}},
+  \code{\link{demo}(setup.gt.demo)}.
 }
 \examples{\dontrun{
-library(RSQLite)
-tmpname <- tempfile('db')
-gt.db <- dbConnect(dbDriver('SQLite'), tmpname)
-use.gt.db(gt.db)
+# create new SQLite database in a temporary file
+fn <- tempfile()
+dbx <- dbConnect(dbDriver('SQLite'), fn)
+# unlink it so it will go away at the end of the session
+unlink(fn)
+use.gt.db(dbx)
+init.gt.db()
+demo('setup.gt.demo')
 }}
 \keyword{database}
