@@ -39,7 +39,8 @@ rm.sample(dataset.name, sample.name)
   \code{position}.  This information is important because it affects how
   various functions interpret genotyping data in this dataset.
   Sample gender is used to determine ploidy for sex linked assays, and
-  the position is used to parse arrays of packed genotype data.
+  the position is used to index arrays of packed genotype data.
+  Positions are 1-based integers.
 }
 \value{
 If successful, the number of rows inserted or deleted from the sample

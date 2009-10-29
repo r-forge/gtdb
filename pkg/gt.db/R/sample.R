@@ -58,6 +58,10 @@ mk.sample <- function(dataset.name, data)
         warning("sample positions are missing")
         data$position <- NA
     }
+    if (any(data$position < 1) ||
+        any(data$position != round(data$position))) {
+        stop("sample positions should be 1-based integers")
+    }
     sql.exec(gt.db::.gt.db, sql, dset.id, subj.id,
              data[c('sample.name','gender','position')])
 }
