@@ -64,6 +64,7 @@ snp.loadings(x, data)
 gt.demo.check()
 p <- prcomp(gt.dataset('Demo_1', gt.filter=(ploidy=='A')))
 s <- snp.loadings(p, gt.dataset('Demo_1'))
-head(s)
+p$loadings[1:5,1:5]
+s$loadings[1:5,1:5]
 }
 \keyword{multivariate}

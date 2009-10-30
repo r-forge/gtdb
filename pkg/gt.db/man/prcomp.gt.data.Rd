@@ -67,9 +67,10 @@
 }
 \examples{
 gt.demo.check()
-g <- fetch.gt.data('Demo_1')
-p <- prcomp(subset(g, (ploidy=='A')))
-screeplot(p)
-with(p$loadings, plot(PC1, PC2))
+gt <- fetch.gt.data('Demo_1')
+pt <- fetch.pt.data('Demo_1')
+pc <- prcomp(subset(gt, (ploidy=='A')))
+screeplot(pc)
+xyplot(PC1~PC2, pc$loadings, groups=pt$plate, auto.key=TRUE)
 }
 \keyword{multivariate}

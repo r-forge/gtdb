@@ -304,7 +304,7 @@ fetch.prcomp <- function(dataset.name, prcomp.name, nc)
 #---------------------------------------------------------------------
 
 gplot.prcomp <-
-function(x, col=1:5, fn=function(x) sum(x^2), rescale=TRUE,
+function(x, col=1:5, aggr.fn=function(x) sum(x^2), rescale=TRUE,
          xlab=NULL, ylab=NULL, ...)
 {
     d <- x$loadings[col]
@@ -312,8 +312,9 @@ function(x, col=1:5, fn=function(x) sum(x^2), rescale=TRUE,
     nc <- ncol(d)
     for (n in 1:nc) {
         gr=list(inside=list(x=0.93,y=0.1,corner=c(1,1)/2,fun=textGrob(cl[n])))
-        print(gplot(~d[cl[n]], x$assays, fn=fn, rescale=rescale, legend=gr,
-                    colorkey=FALSE, xlab=xlab, ylab=ylab, draw.at=FALSE, ...),
+        print(gplot(~d[cl[n]], x$assays, aggr.fn=aggr.fn,
+                    rescale=rescale, legend=gr, colorkey=FALSE,
+                    xlab=xlab, ylab=ylab, draw.at=FALSE, ...),
               newpage=(n==1), split=c(1,n,1,nc))
     }
 }

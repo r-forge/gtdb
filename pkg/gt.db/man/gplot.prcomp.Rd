@@ -24,13 +24,13 @@
   components analysis.
 }
 \usage{
-gplot.prcomp(x, col=1:5, fn=function(x) sum(x^2),
+gplot.prcomp(x, col=1:5, aggr.fn=function(x) sum(x^2),
              rescale=TRUE, xlab=NULL, ylab=NULL, ...)
 }
 \arguments{
   \item{x}{a data structure returned by \code{\link{snp.loadings}}.}
   \item{col}{a vector of component numbers to plot.}
-  \item{fn}{an aggregating function to apply to data within each bin.}
+  \item{aggr.fn}{an aggregating function to apply to data within each bin.}
   \item{rescale}{logical: indicates if results should be scaled based
     on the genome-wide average bin value.}
   \item{xlab, ylab}{axis labels passed to \code{\link{gplot}}.}
