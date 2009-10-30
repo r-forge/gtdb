@@ -83,7 +83,7 @@ fetch.gt.data(dataset.name, mapping.name, assay.name, dbsnp.rsid,
   \item{genotype}{a string of a/h/b/n/x genotypes.}
   \item{qscore}{a string of packed quality scores.}
   \item{raw.data}{a string containing packed raw data (such as
-    intensities or read counts).}
+    signal intensities or read counts).}
 }
 \seealso{
   \code{\link{summary.gt.data}}, \code{\link{unpack.gt.matrix}}.

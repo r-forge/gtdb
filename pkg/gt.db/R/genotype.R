@@ -63,8 +63,8 @@ function(dataset.name, mapping.name, assay.name, dbsnp.rsid,
         and mapping_id=:2')
 
     dset.id <- lookup.id('dataset', dataset.name)
-    platform.name <- ls.dataset(,dataset.name)$platform.name
-    map.id <- lookup.mapping.id(platform.name, mapping.name)
+    ds <- ls.dataset(,dataset.name)
+    map.id <- lookup.mapping.id(ds$platform.name, mapping.name)
     dat <- .sql.prep.data(dset.id, map.id)
     if (!missing(assay.name)) {
         sql <- paste(sql, 'and a.name=:3')
@@ -101,7 +101,7 @@ function(dataset.name, mapping.name, assay.name, dbsnp.rsid,
 
     s <- subset(ls.sample(dataset.name), !is.na(position))
     s <- s[order(s$position),]
-    if (!all.equal(s$position,1:nrow(s)) ||
+    if (!identical(s$position,1:nrow(s)) ||
         any(nchar(d$genotype) != nrow(s))) {
         stop('inconsistent sample layout information!');
     }
@@ -111,7 +111,8 @@ function(dataset.name, mapping.name, assay.name, dbsnp.rsid,
                      show.ids, 'assay.data.id')
     class(d) <- c('gt.data','data.frame')
     keep.attr(d, dataset.name=dataset.name,
-              platform.name=platform.name,
+              raw.layout=ds$raw.layout,
+              platform.name=ds$platform.name,
               mapping.name=names(map.id),
               gender=g, sample.name=s$sample.name)
 }
@@ -210,15 +211,28 @@ reshape.gt.data <- function(gt.data, ...)
     if (!is.null(gt.data$qscore)) {
         d$qscore <- as.integer(cvt.fn(gt.data$qscore))
     }
-    if (!is.null(gt.data$raw.data)) {
-        n <- nrow(d)
+    if (is.null(gt.data$raw.data))
+        return(d)
+    f <- attr(gt.data,'raw.layout')
+    if (is.null(f))
+        stop('raw data layout unavailable')
+    nr <- nrow(d)
+    if (f == 'signal') {
         i <- readBin(cvt.fn(gt.data$raw.data), what='int',
-                     n=2*n, size=2, signed=FALSE, endian='little')
+                     n=2*nr, size=2, signed=FALSE, endian='little')
         i <- na.if(i, 65535)
-        dim(i) <- c(2,n)
-        d <- cbind(d, intensity.a=i[1,], intensity.b=i[2,])
+        dim(i) <- c(2,nr)
+        cbind(d, signal.a=i[1,], signal.b=i[2,])
+    } else if (f == 'seqread') {
+        i <- readBin(cvt.fn(gt.data$raw.data), what='int',
+                     n=4*nr, size=1, signed=FALSE, endian='little')
+        i <- na.if(i, 255)
+        dim(i) <- c(4,nr)
+        cbind(d, fwd.a=i[1,], rev.a=i[2,], fwd.b=i[3,], rev.b=i[4,])
+    } else {
+        warning('unknown raw data layout')
+        d
     }
-    d
 }
 
 .mask.dat <- function(str, mask, squeeze=FALSE)

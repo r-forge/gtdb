@@ -143,6 +143,7 @@ create table dataset
   platform_id integer not null,
   name varchar(64) unique not null,
   description varchar(255),
+  raw_layout varchar(64),
   is_hidden integer not null,
   created_by varchar(64),
   created_dt date,

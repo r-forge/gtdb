@@ -21,8 +21,8 @@
 \alias{xyplot.gt.data}
 \title{Plot Genotype Cluster Data}
 \description{
-  Plot raw genotype cluster data (i.e. intensities), with predicted
-  ellipsoid boundary regions.
+  Plot raw genotype cluster data (i.e. signal intensities), with
+  predicted ellipsoid boundary regions.
 }
 \usage{
 gt.cluster.plot(data, rescale=TRUE, bounds=c(0.5,0.95), min.points=4,

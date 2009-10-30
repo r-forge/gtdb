@@ -37,7 +37,7 @@ ls.dataset(project.name='\%', dataset.name='\%',
     database keys.}
 }
 \value{
-  A data frame with one row per dataset, and 7 or 10 columns:
+  A data frame with one row per dataset, and 8 or 11 columns:
   \item{dataset.id}{if \code{show.ids} is set: the unique integer key
     for this dataset.}
   \item{dataset.name}{a short, unique identifier for the dataset.}
@@ -49,6 +49,8 @@ ls.dataset(project.name='\%', dataset.name='\%',
   \item{platform.name}{the genotyping platform associated with this
     dataset.}
   \item{description}{a free-text description of the dataset.}
+  \item{raw.layout}{a keyword indicating how raw data associated with
+    individual assays is structured.}
   \item{is.hidden}{logical: indicates if the project is hidden.}
   \item{created.by}{the user name that created the dataset.}
   \item{created.dt}{the creation date of the dataset.}

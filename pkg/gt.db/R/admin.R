@@ -97,7 +97,8 @@ function(project.name='%', dataset.name='%',
      "select dataset_id, d.name dataset_name,
              d.project_id, p.name project_name,
              d.platform_id, m.name platform_name,
-             d.description, d.is_hidden, d.created_by, d.created_dt
+             d.description, d.raw_layout, d.is_hidden,
+             d.created_by, d.created_dt
       from dataset d, project p, platform m
       where d.project_id=p.project_id
         and d.platform_id=m.platform_id
@@ -112,16 +113,18 @@ function(project.name='%', dataset.name='%',
 
 mk.dataset <-
 function(dataset.name, project.name, platform.name,
-         description, is.hidden=FALSE)
+         description, raw.layout=c(NA,'signal','seqread'),
+         is.hidden=FALSE)
 {
+    raw.layout <- match.arg(raw.layout)
     .check.name(dataset.name)
     proj.id <- lookup.id('project', project.name)
     plat.id <- lookup.id('platform', platform.name)
     sql <-
      "insert into dataset
-      values (null, :1, :2, :3, :4, :5, :user:, :sysdate:)"
+      values (null, :1, :2, :3, :4, :5, :6, :user:, :sysdate:)"
     sql.exec(gt.db::.gt.db, sql, proj.id, plat.id, dataset.name,
-             description, is.hidden)
+             description, raw.layout, is.hidden)
 }
 
 rm.dataset <- function(dataset.name)

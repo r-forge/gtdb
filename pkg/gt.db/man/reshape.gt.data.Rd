@@ -40,7 +40,11 @@ reshape.gt.data(gt.data, ...)
   \item{sample.name}{a sample identifier.}
   \item{genotype}{the genotype for the specified sample and assay.}
   \item{qscore}{the corresponding quality score.}
-  \item{\dots}{additional columns of raw data, depending on the dataset.}
+  \item{\dots}{additional columns of raw data, depending on the
+    dataset.  For datasets with signal intensities, there will be two
+    columns: \code{signal.a} and \code{signal.b}.  For data with
+    sequencing read counts, there will be four columns: \code{fwd.a},
+    \code{rev.a}, \code{fwd.b}, and \code{rev.b}.}
 }
 \seealso{
   \code{\link{fetch.gt.data}}, \code{\link{unpack.gt.matrix}},

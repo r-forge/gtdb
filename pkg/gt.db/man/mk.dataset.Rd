@@ -26,7 +26,8 @@
 }
 \usage{
 mk.dataset(dataset.name, project.name, platform.name,
-           description, is.hidden=FALSE)
+           description, raw.layout=c(NA,'signal','seqread'),
+           is.hidden=FALSE)
 rm.dataset(dataset.name)
 }
 \arguments{
@@ -34,6 +35,8 @@ rm.dataset(dataset.name)
   \item{project.name}{the project associated with this dataset.}
   \item{platform.name}{the genotyping platform for this dataset.}
   \item{description}{a free-text description of the dataset.}
+  \item{raw.layout}{a keyword describing how raw data associated with
+    individual assays is structured.}
   \item{is.hidden}{logical: indicates if the dataset is hidden.}
 }
 \details{

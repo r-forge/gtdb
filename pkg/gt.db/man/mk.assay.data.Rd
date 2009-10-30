@@ -40,10 +40,16 @@ mk.assay.data(dataset.name, data)
     \item{genotype}{a string of a/h/b/n/x genotypes.}
     \item{qscore}{a string of packed quality scores.}
     \item{raw.data}{a string containing packed raw data (such as
-      intensities or read counts).}
+      signal intensities or read counts).}
   }
   An \code{assay.name} column can be supplied in place of
   \code{assay.id}.
+
+  Two raw data layouts are currently supported.  The 'signal' layout
+  consists of a 16-bit unsigned little endian value for each allele.
+  The 'seqread' layout consists of 8-bit unsigned counts for forward
+  and reverse orientations for each allele, representing read counts
+  from a sequencing experiment.
 }
 \value{
   If successful, the number of rows inserted into the assay data

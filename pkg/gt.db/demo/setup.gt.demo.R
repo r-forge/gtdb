@@ -54,7 +54,8 @@ mk.platform('Demo_Set_2', 'Demo Chr21 SNPs')
 mk.assay.group('Demo_Set_2', 'Des11', 'Array 11')
 mk.mapping('Demo_Set_2', 'Demo_Set_2_b36',
            'Platform 2 Mapping to NCBI Build 36', 'ncbi_b36')
-mk.dataset('Demo_2', 'Demo', 'Demo_Set_2', 'Demo (HapMap) Dataset #2')
+mk.dataset('Demo_2', 'Demo', 'Demo_Set_2',
+           'Demo (HapMap) Dataset #2', 'signal')
 mk.flag('assay_data', 'Demo_2', 1, 'pass', 'Passed QC filters')
 
 # now load the data: note that there are some duplicate samples

@@ -44,7 +44,8 @@ function(x, y, group.number=1, bounds=c(), min.points=4, ...)
         col=c('#377db8','#e31a1c','#2daf4a','black')
     ),
     superpose.line=list(
-        lty=c(1,1,1,0)
+        lty=c(1,1,1,0),
+        col=c('#377db8','#e31a1c','#2daf4a','black')
     )
 )
 
@@ -59,14 +60,21 @@ function(data, rescale=TRUE, bounds=c(0.5,0.95), min.points=4,
         p$xlim <- c(min(p$xlim,p$ylim), max(p$xlim,p$ylim))
         p
     }
-    x <- data$intensity.a
-    y <- data$intensity.b
+    if ('signal.a' %in% names(data)) {
+        x <- data$signal.a
+        y <- data$signal.b
+    } else if ('fwd.a' %in% names(data)) {
+        x <- data$fwd.a+data$rev.a
+        y <- data$fwd.b+data$rev.b
+    } else {
+        stop("raw data not available")
+    }
     n <- factor(data$assay.name)
     if (rescale) {
-      q <- tapply(c(x,y), rep(n,2), range, na.rm=TRUE)
-      q <- do.call('rbind', q)
-      x <- 0.01 + 0.98*(x - q[n,1])/(q[n,2]-q[n,1])
-      y <- 0.01 + 0.98*(y - q[n,1])/(q[n,2]-q[n,1])
+        q <- tapply(c(x,y), rep(n,2), range, na.rm=TRUE)
+        q <- do.call('rbind', q)
+        x <- 0.01 + 0.98*(x - q[n,1])/(q[n,2]-q[n,1])
+        y <- 0.01 + 0.98*(y - q[n,1])/(q[n,2]-q[n,1])
     }
     gt <- data$genotype
     if (is.numeric(gt)) {

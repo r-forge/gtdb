@@ -21,7 +21,7 @@
 \title{Manually Assign Genotype Calls}
 \description{
   Interactively assign genotype calls by inspection of a plot of
-  reference versus alternate intensities.
+  reference versus alternate signal intensities.
 }
 \usage{
 adjust.gt.calls(data, ..., radius=6)
