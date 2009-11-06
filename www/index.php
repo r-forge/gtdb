@@ -62,7 +62,7 @@ library(gt.db)
   </li>
   <li>Create a temporary SQLite database
 <pre>
-library(SQLite)
+library(RSQLite)
 fname <- tempfile()
 dbh <- dbConnect(dbDriver('SQLite'), fname)
 </pre>
@@ -77,8 +77,12 @@ demo('setup.gt.demo')
   </li>
   <li>Explore the code examples!
 <pre>
+example(fetch.gt.data)
+example(fetch.pt.data)
 example(prcomp.gt.data)
 example(xyplot.gt.data)
+example(ld.plot)
+example(score.gt.data)
 </pre>
   </li>
 </ul>
