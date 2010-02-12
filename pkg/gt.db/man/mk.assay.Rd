@@ -1,5 +1,6 @@
 %
 % Copyright (C) 2009, Perlegen Sciences, Inc.
+% Copyright (C) 2010, 23andMe, Inc.
 % 
 % Written by David A. Hinds <dhinds@sonic.net>
 % 
@@ -24,11 +25,13 @@
   defined genotyping platform.
 }
 \usage{
-mk.assay(platform.name, data)
+mk.assay(platform.name, data, progress=FALSE)
 }
 \arguments{
   \item{platform.name}{a short unique identifier for the platform.}
   \item{data}{a data frame with one row per assay.  See details.}
+  \item{progress}{logical: indicates whether to report progress while
+    the data is loaded.}
 }
 \details{
   A data frame of assay information should provide four columns:

@@ -1,5 +1,6 @@
 #
 # Copyright (C) 2009, Perlegen Sciences, Inc.
+# Copyright (C) 2010, 23andMe, Inc.
 #
 # Written by David A. Hinds <dhinds@sonic.net>
 #
@@ -188,7 +189,7 @@ sql.query <- function(db, sql, ...)
     max(1, floor(1024 * chunk.kb / rowsz))
 }
 
-.ora.sql.exec <- function(db, sql, ..., chunk.kb=256)
+.ora.sql.exec <- function(db, sql, ..., chunk.kb=256, progress=FALSE)
 {
     efn <- function(e)
     {
@@ -201,9 +202,14 @@ sql.query <- function(db, sql, ...)
 
     chunk.rows <- .chunk.rows(data, chunk.kb)
     ps <- tryCatch(dbPrepareStatement(db, sql, data), error=efn)
-    for (lo in seq(1,max(1,nrow(data)),chunk.rows)) {
-        d <- data[lo:min(lo+chunk.rows-1, nrow(data)),,drop=FALSE]
+    nr <- 0
+    nd <- nrow(data)
+    if (progress) progress.bar(0, nd)
+    for (lo in seq(1,max(1,nd),chunk.rows)) {
+        d <- data[lo:min(lo+chunk.rows-1,nd),,drop=FALSE]
         tryCatch(dbExecStatement(ps, d), error=efn)
+        nr <- nr + nrow(d)
+        if (progress) progress.bar(nr, nd)
     }
 
     nr <- dbGetRowsAffected(ps)
@@ -228,7 +234,7 @@ sql.query <- function(db, sql, ...)
     dbSendQuery(stmt$db, sql, ...)
 }
 
-.my.sql.exec <- function(db, sql, ..., chunk.kb=256)
+.my.sql.exec <- function(db, sql, ..., chunk.kb=256, progress=FALSE)
 {
     efn <- function(e)
     {
@@ -240,23 +246,27 @@ sql.query <- function(db, sql, ...)
     nr <- 0
 
     ps <- tryCatch(.myPrepareStatement(db, sql, data), error=efn)
-    if (regexpr('^insert.*\\svalues\\s*\\(', sql) > 0) {
+    nd <- nrow(data)
+    if (nd && (regexpr('^insert.*\\svalues\\s*\\(', sql) > 0)) {
+        if (progress) progress.bar(0, nd)
         chunk.rows <- .chunk.rows(data, chunk.kb)
-        for (lo in seq(1,nrow(data),chunk.rows)) {
-            d <- data[lo:min(lo+chunk.rows-1, nrow(data)),,drop=FALSE]
+        for (lo in seq(1,nd,chunk.rows)) {
+            d <- data[lo:min(lo+chunk.rows-1,nd),,drop=FALSE]
             rs <- tryCatch(.myInsertMultiple(ps, d), error=efn)
             nr <- nr + dbGetRowsAffected(rs)
+            if (progress) progress.bar(nr, nd)
         }
     } else {
-        for (i in 1:max(1,nrow(data))) {
-            rs <- tryCatch(.myExecStatement(ps, data[i,,drop=FALSE]), error=efn)
+        for (i in 1:max(1,nd)) {
+            rs <- tryCatch(.myExecStatement(ps, data[i,,drop=FALSE]),
+                           error=efn)
             nr <- nr + dbGetRowsAffected(rs)
         }
     }
     nr
 }
 
-.lite.sql.exec <- function(db, sql, ..., chunk.kb=256)
+.lite.sql.exec <- function(db, sql, ..., chunk.kb=256, progress=FALSE)
 {
     efn <- function(e)
     {
@@ -269,18 +279,21 @@ sql.query <- function(db, sql, ...)
     sql <- gsub(":[0-9]+", "?", sql)
 
     nr <- 0
+    nd <- nrow(data)
     chunk.rows <- .chunk.rows(data, chunk.kb)
     dbBeginTransaction(db)
+    if (progress) progress.bar(0, nd)
     for (lo in seq(1,max(1,nrow(data)),chunk.rows)) {
-        d <- data[lo:min(lo+chunk.rows-1, nrow(data)),,drop=FALSE]
+        d <- data[lo:min(lo+chunk.rows-1,nd),,drop=FALSE]
         rs <- tryCatch(dbSendPreparedQuery(db, sql, d), error=efn)
         nr <- nr + dbGetRowsAffected(rs)
+        if (progress) progress.bar(nr, nd)
     }
     dbCommit(db)
     nr
 }
 
-sql.exec <- function(db, sql, ..., chunk.kb=256)
+sql.exec <- function(db, sql, ..., chunk.kb=256, progress=FALSE)
 standardGeneric('sql.exec')
 
 setGeneric('sql.exec', sql.exec)

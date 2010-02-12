@@ -1,5 +1,6 @@
 %
 % Copyright (C) 2009, Perlegen Sciences, Inc.
+% Copyright (C) 2010, 23andMe, Inc.
 % 
 % Written by David A. Hinds <dhinds@sonic.net>
 % 
@@ -32,7 +33,7 @@
 }
 \usage{
   sql.query(db, sql, ...)
-  sql.exec(db, sql, ..., chunk.kb=256)
+  sql.exec(db, sql, ..., chunk.kb=256, progress=FALSE)
 }
 \arguments{
   \item{db}{a DBI connection object returned by
@@ -43,6 +44,8 @@
     construct a data frame of bind variables.}
   \item{chunk.kb}{when processing multiple rows of bind variables,
     a rough limit on the amount of data to send per query.}
+  \item{progress}{logical: indicates whether to report progress during
+    long operations.}
 }
 \details{
   To facilitate database agnostic code, several special elements can

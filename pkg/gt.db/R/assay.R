@@ -1,5 +1,6 @@
 #
 # Copyright (C) 2009, Perlegen Sciences, Inc.
+# Copyright (C) 2010, 23andMe, Inc.
 #
 # Written by David A. Hinds <dhinds@sonic.net>
 #
@@ -114,15 +115,19 @@ ls.assay <- function(platform.name, assay.group='%', show.ids=FALSE)
     .filter.ids(data.frame(r, row.names=r$assay.name), show.ids)
 }
 
-mk.assay <- function(platform.name, data)
+mk.assay <- function(platform.name, data, progress=FALSE)
 {
     plat.id <- lookup.id('platform', platform.name)
     grp.id <- lookup.id('assay_group', unique(data$assay.group),
                         platform.id=plat.id)
     .check.name(data$assay.name)
+    r <- (regexpr('^[a-zA-Z]*_[a-zA-Z]*$', data$probe.seq) < 0)
+    if (any(r,na.rm=TRUE))
+        stop("invalid probe sequence(s)", call.=FALSE)
     sql <- 'insert into assay values (null,:1,:2,:3,:4,:5)'
     sql.exec(gt.db::.gt.db, sql, plat.id, grp.id[data$assay.group],
-             data[c('assay.name','alleles','probe.seq')])
+             data[c('assay.name','alleles','probe.seq')],
+             progress=progress)
 }
 
 #---------------------------------------------------------------------
@@ -149,7 +154,8 @@ function(platform.name, mapping.name, show.ids=FALSE)
     .filter.ids(data.frame(r,row.names=r$assay.name), show.ids)
 }
 
-mk.assay.position <- function(platform.name, mapping.name, data)
+mk.assay.position <-
+function(platform.name, mapping.name, data, progress=FALSE)
 {
     map.id <- lookup.mapping.id(platform.name, mapping.name)
     if (is.null(data$assay.id)) {
@@ -166,12 +172,13 @@ mk.assay.position <- function(platform.name, mapping.name, data)
     data$ploidy <- .fixup.ploidy(data$ploidy)
     sql.exec(gt.db::.gt.db, sql, map.id,
              data[c('assay.id', 'scaffold', 'position', 'strand',
-                    'ploidy', 'dbsnp.rsid', 'dbsnp.orient')])
+                    'ploidy', 'dbsnp.rsid', 'dbsnp.orient')],
+             progress=progress)
 }
 
 #---------------------------------------------------------------------
 
-mk.assay.data <- function(dataset.name, data)
+mk.assay.data <- function(dataset.name, data, progress=FALSE)
 {
     dset.id <- lookup.id('dataset', dataset.name)
     if (is.null(data$flags)) data$flags <- 0
@@ -199,5 +206,5 @@ mk.assay.data <- function(dataset.name, data)
       values (null,:1,:2,:3,:4,%1$s(:5),%1$s(:6))'
     sql <- sprintf(sql, cvt.fn)
     cols <- c('assay.id','flags','genotype','qscore','raw.data')
-    sql.exec(gt.db::.gt.db, sql, dset.id, data[cols])
+    sql.exec(gt.db::.gt.db, sql, dset.id, data[cols], progress=progress)
 }

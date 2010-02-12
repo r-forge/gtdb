@@ -1,5 +1,6 @@
 %
 % Copyright (C) 2009, Perlegen Sciences, Inc.
+% Copyright (C) 2010, 23andMe, Inc.
 % 
 % Written by David A. Hinds <dhinds@sonic.net>
 % 
@@ -25,12 +26,14 @@
   genotyping assays.
 }
 \usage{
-mk.assay.position(platform.name, mapping.name, data)
+mk.assay.position(platform.name, mapping.name, data, progress=FALSE)
 }
 \arguments{
   \item{platform.name}{a short unique identifier for the platform.}
   \item{mapping.name}{the platform mapping to be populated.}
   \item{data}{a data frame with one row per assay.  See details.}
+  \item{progress}{logical: indicates whether to report progress while
+    the data is loaded.}
 }
 \details{
   If \code{mapping.name} is missing, it will default to the current

@@ -1,5 +1,6 @@
 %
 % Copyright (C) 2009, Perlegen Sciences, Inc.
+% Copyright (C) 2010, 23andMe, Inc.
 % 
 % Written by David A. Hinds <dhinds@sonic.net>
 % 
@@ -25,11 +26,13 @@
   defined genotype assays.
 }
 \usage{
-mk.assay.data(dataset.name, data)
+mk.assay.data(dataset.name, data, progress=FALSE)
 }
 \arguments{
   \item{dataset.name}{a short unique identifier for the genotype dataset.}
   \item{data}{a data frame with one row per assay.  See details.}
+  \item{progress}{logical: indicates whether to report progress while
+    the data is loaded.}
 }
 \details{
   A data frame of genotype data can provide up to five columns of
