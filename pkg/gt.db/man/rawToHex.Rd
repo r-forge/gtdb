@@ -1,5 +1,6 @@
 %
 % Copyright (C) 2009, Perlegen Sciences, Inc.
+% Copyright (C) 2010, 23andMe, Inc.
 % 
 % Written by David A. Hinds <dhinds@sonic.net>
 % 
@@ -24,18 +25,25 @@
   Convert between raw vectors and hex strings.
 }
 \usage{
-hexToRaw(hex)
+hexToRaw(hex, drop=TRUE)
 rawToHex(raw)
 }
 \arguments{
-  \item{hex}{a string of hex digits.}
-  \item{raw}{a raw vector.}
+  \item{hex}{a character vector composed of strings of hex digits, all
+    the same length.}
+  \item{drop}{logical: indicates whether to convert a single-column
+    result to a vector.}
+  \item{raw}{a raw vector or matrix.}
 }
 \value{
-  For \code{hexToRaw}, a raw vector constructed by converting each
-  consecutive pair of hex digits to one byte.  For \code{rawToHex}, a
-  character string formed by converting each byte of the input vector
-  to its two-digit hex representation.
+  For \code{hexToRaw}, a raw matrix with one column per string in
+  \code{hex}, constructed by converting each consecutive pair of hex
+  digits to one byte.
+
+  For \code{rawToHex}, a character string formed by converting each byte
+  of the input vector to its two-digit hex representation, or a vector
+  formed by converting each column of an input matrix to its hex
+  representation.
 }
 \seealso{
   \code{\link{charToRaw}}, \code{\link{rawToChar}}.
@@ -43,5 +51,6 @@ rawToHex(raw)
 \examples{
 hexToRaw('1a3b1a3b')
 rawToHex(as.raw(seq(0,100,10)))
+hexToRaw(c('1234','5678','9abc'))
 }
 \keyword{classes}

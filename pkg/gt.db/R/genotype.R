@@ -1,5 +1,6 @@
 #
 # Copyright (C) 2009, Perlegen Sciences, Inc.
+# Copyright (C) 2010, 23andMe, Inc.
 #
 # Written by David A. Hinds <dhinds@sonic.net>
 #
@@ -216,23 +217,7 @@ reshape.gt.data <- function(gt.data, ...)
     f <- attr(gt.data,'raw.layout')
     if (is.null(f))
         stop('raw data layout unavailable')
-    nr <- nrow(d)
-    if (f == 'signal') {
-        i <- readBin(cvt.fn(gt.data$raw.data), what='int',
-                     n=2*nr, size=2, signed=FALSE, endian='little')
-        i <- na.if(i, 65535)
-        dim(i) <- c(2,nr)
-        cbind(d, signal.a=i[1,], signal.b=i[2,])
-    } else if (f == 'seqread') {
-        i <- readBin(cvt.fn(gt.data$raw.data), what='int',
-                     n=4*nr, size=1, signed=FALSE, endian='little')
-        i <- na.if(i, 255)
-        dim(i) <- c(4,nr)
-        cbind(d, fwd.a=i[1,], rev.a=i[2,], fwd.b=i[3,], rev.b=i[4,])
-    } else {
-        warning('unknown raw data layout')
-        d
-    }
+    cbind(d, unpack.raw.data(cvt.fn(gt.data$raw.data), f))
 }
 
 .mask.dat <- function(str, mask, squeeze=FALSE)

@@ -1,5 +1,6 @@
 %
 % Copyright (C) 2009, Perlegen Sciences, Inc.
+% Copyright (C) 2010, 23andMe, Inc.
 % 
 % Written by David A. Hinds <dhinds@sonic.net>
 % 
@@ -44,7 +45,9 @@ reshape.gt.data(gt.data, ...)
     dataset.  For datasets with signal intensities, there will be two
     columns: \code{signal.a} and \code{signal.b}.  For data with
     sequencing read counts, there will be four columns: \code{fwd.a},
-    \code{rev.a}, \code{fwd.b}, and \code{rev.b}.}
+    \code{rev.a}, \code{fwd.b}, and \code{rev.b}.  For Affymetrix CHP
+    data, there will be three columns: \code{log.ratio},
+    \code{strength}, and \code{forced.call}.}
 }
 \seealso{
   \code{\link{fetch.gt.data}}, \code{\link{unpack.gt.matrix}},

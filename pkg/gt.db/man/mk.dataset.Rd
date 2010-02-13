@@ -1,5 +1,6 @@
 %
 % Copyright (C) 2009, Perlegen Sciences, Inc.
+% Copyright (C) 2010, 23andMe, Inc.
 % 
 % Written by David A. Hinds <dhinds@sonic.net>
 % 
@@ -26,7 +27,7 @@
 }
 \usage{
 mk.dataset(dataset.name, project.name, platform.name,
-           description, raw.layout=c(NA,'signal','seqread'),
+           description, raw.layout=c(NA,'signal','seqread','chpdata'),
            is.hidden=FALSE)
 rm.dataset(dataset.name)
 }

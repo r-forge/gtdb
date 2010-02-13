@@ -1,5 +1,6 @@
 #
 # Copyright (C) 2009, Perlegen Sciences, Inc.
+# Copyright (C) 2010, 23andMe, Inc.
 #
 # Written by David A. Hinds <dhinds@sonic.net>
 #
@@ -30,8 +31,14 @@ na.if <- function(v1,v2) ifelse(v1==v2,NA,v1)
 rawToHex <- function(raw)
 .Call("raw_to_hex", raw, PACKAGE="gt.db")
 
-hexToRaw <- function(hex)
-.Call("hex_to_raw", hex, PACKAGE="gt.db")
+hexToRaw <- function(hex, drop=TRUE)
+{
+    x <- .Call("hex_to_raw", hex, PACKAGE="gt.db")
+    if (drop && (ncol(x) <= 1))
+        as.vector(x)
+    else
+        x
+}
 
 #---------------------------------------------------------------------
 

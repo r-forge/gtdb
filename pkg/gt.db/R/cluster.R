@@ -1,5 +1,6 @@
 #
 # Copyright (C) 2009, Perlegen Sciences, Inc.
+# Copyright (C) 2010, 23andMe, Inc.
 #
 # Written by David A. Hinds <dhinds@sonic.net>
 #
@@ -54,28 +55,56 @@ function(data, rescale=TRUE, bounds=c(0.5,0.95), min.points=4,
          between=list(x=0.5,y=0.5), scales=list(alternating=0),
          xlab=NULL, ylab=NULL, par.settings=.gt.settings, ...)
 {
-    prepanel.equal <- function(...)
-    {
-        p <- prepanel.default.xyplot(...)
-        p$xlim <- c(min(p$xlim,p$ylim), max(p$xlim,p$ylim))
-        p
-    }
     if ('signal.a' %in% names(data)) {
         x <- data$signal.a
         y <- data$signal.b
+        equal <- TRUE
     } else if ('fwd.a' %in% names(data)) {
         x <- data$fwd.a+data$rev.a
         y <- data$fwd.b+data$rev.b
+        equal <- TRUE
+    } else if ('strength' %in% names(data)) {
+        x <- data$log.ratio
+        y <- data$strength
+        equal <- FALSE
     } else {
         stop("raw data not available")
     }
+
+    if (equal) {
+        # Equal scaling of X and Y
+        prepanel <- function(...)
+        {
+            p <- prepanel.default.xyplot(...)
+            p$xlim <- p$ylim <- c(min(p$xlim,p$ylim), max(p$xlim,p$ylim))
+            p
+        }
+    } else {
+        # center X at 0
+        prepanel <- function(...)
+        {
+            p <- prepanel.default.xyplot(...)
+            p$xlim <- c(-1,1)*max(abs(p$xlim))
+            p
+        }
+    }
+
     n <- factor(data$assay.name)
     if (rescale) {
-        q <- tapply(c(x,y), rep(n,2), range, na.rm=TRUE)
-        q <- do.call('rbind', q)
-        x <- 0.01 + 0.98*(x - q[n,1])/(q[n,2]-q[n,1])
-        y <- 0.01 + 0.98*(y - q[n,1])/(q[n,2]-q[n,1])
+        if (equal) {
+            q <- tapply(c(x,y), rep(n,2), range, na.rm=TRUE)
+            q <- do.call('rbind', q)
+            x <- 0.01 + 0.98*(x - q[n,1])/(q[n,2]-q[n,1])
+            y <- 0.01 + 0.98*(y - q[n,1])/(q[n,2]-q[n,1])
+        } else {
+            q <- tapply(x, n, function(x) max(abs(x),na.rm=TRUE))
+            x <- x / q[n]
+            q <- tapply(y, n, range, na.rm=TRUE)
+            q <- do.call('rbind', q)
+            y <- 0.01 + 0.98*(y - q[n,1])/(q[n,2]-q[n,1])
+        }
     }
+
     gt <- data$genotype
     if (is.numeric(gt)) {
         gt <- factor(gt, levels=0:3)
@@ -88,7 +117,7 @@ function(data, rescale=TRUE, bounds=c(0.5,0.95), min.points=4,
         gt[is.na(gt)] <- nn
     }
     p <- xyplot(y~x|n, groups=gt, bounds=bounds, min.points=min.points,
-                scales=scales, prepanel=prepanel.equal, aspect=1,
+                scales=scales, prepanel=prepanel, aspect=1,
                 panel=panel.superpose, panel.groups=panel.cluster,
                 xlab=xlab, ylab=ylab, between=between,
                 par.settings=par.settings, ...)

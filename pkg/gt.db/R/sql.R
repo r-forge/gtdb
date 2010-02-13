@@ -204,12 +204,12 @@ sql.query <- function(db, sql, ...)
     ps <- tryCatch(dbPrepareStatement(db, sql, data), error=efn)
     nr <- 0
     nd <- nrow(data)
-    if (progress) progress.bar(0, nd)
+    if (nd && progress) progress.bar(0, nd)
     for (lo in seq(1,max(1,nd),chunk.rows)) {
         d <- data[lo:min(lo+chunk.rows-1,nd),,drop=FALSE]
         tryCatch(dbExecStatement(ps, d), error=efn)
         nr <- nr + nrow(d)
-        if (progress) progress.bar(nr, nd)
+        if (nd && progress) progress.bar(nr, nd)
     }
 
     nr <- dbGetRowsAffected(ps)
@@ -247,8 +247,8 @@ sql.query <- function(db, sql, ...)
 
     ps <- tryCatch(.myPrepareStatement(db, sql, data), error=efn)
     nd <- nrow(data)
+    if (nd && progress) progress.bar(0, nd)
     if (nd && (regexpr('^insert.*\\svalues\\s*\\(', sql) > 0)) {
-        if (progress) progress.bar(0, nd)
         chunk.rows <- .chunk.rows(data, chunk.kb)
         for (lo in seq(1,nd,chunk.rows)) {
             d <- data[lo:min(lo+chunk.rows-1,nd),,drop=FALSE]
@@ -261,6 +261,7 @@ sql.query <- function(db, sql, ...)
             rs <- tryCatch(.myExecStatement(ps, data[i,,drop=FALSE]),
                            error=efn)
             nr <- nr + dbGetRowsAffected(rs)
+            if (nd && progress) progress.bar(i, nd)
         }
     }
     nr
@@ -274,20 +275,30 @@ sql.query <- function(db, sql, ...)
         .dbClearAll(db)
         stop(e)
     }
-    data <- .sql.prep.data(...)
     sql <- .fixup.sql(db, sql)
     sql <- gsub(":[0-9]+", "?", sql)
 
-    nr <- 0
+    if (!length(list(...))) {
+        dbBeginTransaction(db)
+        rs <- tryCatch(dbSendQuery(db, sql), error=efn)
+        nr <- dbGetRowsAffected(rs)
+        dbCommit(db)
+        return(nr)
+    }
+
+    data <- .sql.prep.data(...)
+    nu <- nr <- 0
     nd <- nrow(data)
+    if (!nd) return(0)
     chunk.rows <- .chunk.rows(data, chunk.kb)
     dbBeginTransaction(db)
     if (progress) progress.bar(0, nd)
-    for (lo in seq(1,max(1,nrow(data)),chunk.rows)) {
+    for (lo in seq(1,nd,chunk.rows)) {
         d <- data[lo:min(lo+chunk.rows-1,nd),,drop=FALSE]
         rs <- tryCatch(dbSendPreparedQuery(db, sql, d), error=efn)
         nr <- nr + dbGetRowsAffected(rs)
-        if (progress) progress.bar(nr, nd)
+        nu <- nu + nrow(d)
+        if (progress) progress.bar(nu, nd)
     }
     dbCommit(db)
     nr

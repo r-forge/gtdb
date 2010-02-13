@@ -48,11 +48,13 @@ mk.assay.data(dataset.name, data, progress=FALSE)
   An \code{assay.name} column can be supplied in place of
   \code{assay.id}.
 
-  Two raw data layouts are currently supported.  The 'signal' layout
+  Three raw data layouts are currently supported.  The 'signal' layout
   consists of a 16-bit unsigned little endian value for each allele.
-  The 'seqread' layout consists of 8-bit unsigned counts for forward
-  and reverse orientations for each allele, representing read counts
-  from a sequencing experiment.
+  The 'seqread' layout consists of 8-bit unsigned counts for forward and
+  reverse orientations for each allele, representing read counts from a
+  sequencing experiment.  The 'chpdata' layout includes a 16-bit 8.8
+  fixed point log allele ratio, a 16-bit 8.8 log signal strength, and 
+  a 'forced' genotype call.
 }
 \value{
   If successful, the number of rows inserted into the assay data
