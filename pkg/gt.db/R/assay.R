@@ -70,63 +70,26 @@ lookup.mapping.id <- function(platform.name, mapping.name)
 
 #---------------------------------------------------------------------
 
-ls.assay.group <- function(platform.name, show.ids=FALSE)
+ls.assay <- function(platform.name, show.ids=FALSE)
 {
     sql <-
-     'select assay_group_id, name assay_group,
-        description, created_by, created_dt
-      from assay_group where platform_id=:1'
+     'select assay_id, name assay_name, alleles, probe_seq
+      from assay where platform_id=:1'
     r <- sql.query(gt.db::.gt.db, sql, lookup.id('platform', platform.name))
-    .filter.ids(r, show.ids)
-}
-
-mk.assay.group <-
-function(platform.name, assay.group, description)
-{
-    .check.name(assay.group)
-    plat.id <- lookup.id('platform', platform.name)
-    sql <-
-     "insert into assay_group
-      values (null, :1, :2, :3, :user:, :sysdate:)"
-    sql.exec(gt.db::.gt.db, sql, plat.id, assay.group, description)
-}
-
-rm.assay.group <- function(platform.name, assay.group)
-{
-    grp.id <- lookup.id('assay_group', assay.group,
-                        platform.id=lookup.id('platform', platform.name))
-    sql <- 'delete from assay_group where assay_group_id=:1'
-    sql.exec(gt.db::.gt.db, sql, grp.id)
-}
-
-#---------------------------------------------------------------------
-
-ls.assay <- function(platform.name, assay.group='%', show.ids=FALSE)
-{
-    sql <-
-     'select g.assay_group_id, g.name assay_group,
-        assay_id, a.name assay_name, alleles, probe_seq
-      from assay_group g, assay a
-      where g.assay_group_id=a.assay_group_id
-        and g.platform_id=:1
-        and g.name like :2'
-    r <- sql.query(gt.db::.gt.db, sql, lookup.id('platform', platform.name),
-                   assay.group)
     .filter.ids(data.frame(r, row.names=r$assay.name), show.ids)
 }
 
 mk.assay <- function(platform.name, data, progress=FALSE)
 {
     plat.id <- lookup.id('platform', platform.name)
-    grp.id <- lookup.id('assay_group', unique(data$assay.group),
-                        platform.id=plat.id)
     .check.name(data$assay.name)
     r <- (regexpr('^[a-zA-Z]*_[a-zA-Z]*$', data$probe.seq) < 0)
     if (any(r,na.rm=TRUE))
         stop("invalid probe sequence(s)", call.=FALSE)
+    if (is.null(data$flags)) data$flags <- 0
     sql <- 'insert into assay values (null,:1,:2,:3,:4,:5)'
-    sql.exec(gt.db::.gt.db, sql, plat.id, grp.id[data$assay.group],
-             data[c('assay.name','alleles','probe.seq')],
+    sql.exec(gt.db::.gt.db, sql, plat.id,
+             data[c('assay.name','flags','alleles','probe.seq')],
              progress=progress)
 }
 

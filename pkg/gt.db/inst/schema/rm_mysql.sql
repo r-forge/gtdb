@@ -1,5 +1,6 @@
 --
 -- Copyright (C) 2009, Perlegen Sciences, Inc.
+-- Copyright (C) 2010, 23andMe, Inc.
 -- 
 -- Written by David A. Hinds <dhinds@sonic.net>
 -- 
@@ -34,6 +35,6 @@ drop table dataset;
 drop table project;
 drop table assay_position;
 drop table mapping;
+drop table assay_flag;
 drop table assay;
-drop table assay_group;
 drop table platform;

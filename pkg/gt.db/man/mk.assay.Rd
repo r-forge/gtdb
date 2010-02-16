@@ -34,11 +34,10 @@ mk.assay(platform.name, data, progress=FALSE)
     the data is loaded.}
 }
 \details{
-  A data frame of assay information should provide four columns:
+  A data frame of assay information can provide up to four columns:
   \describe{
-    \item{assay.group}{an assay group defined with
-      \code{\link{mk.assay.group}}.}
     \item{assay.name}{a unique name (within this platform) for the assay.}
+    \item{flags}{an optional integer value composed of single-bit flags.}
     \item{alleles}{a slash separated list of valid alleles.}
     \item{probe.seq}{the genomic flanking sequence for the assay, with
       the variant position denoted by an underscore (\code{'_'}).}

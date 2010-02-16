@@ -73,9 +73,9 @@
 
 .pack.chpdata <- function(data)
 {
-    x <- writeBin(as.integer(256*data$log.ratio),
+    x <- writeBin(as.integer(round(256*data$log.ratio)),
                   raw(), size=2, endian='little')
-    y <- writeBin(as.integer(256*data$strength),
+    y <- writeBin(as.integer(round(256*data$strength)),
                   raw(), size=2, endian='little')
     z <- as.raw(data$forced.call)
     dim(x) <- dim(y) <- c(2,nrow(data))

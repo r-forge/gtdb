@@ -1,5 +1,6 @@
 %
 % Copyright (C) 2009, Perlegen Sciences, Inc.
+% Copyright (C) 2010, 23andMe, Inc.
 % 
 % Written by David A. Hinds <dhinds@sonic.net>
 % 
@@ -23,30 +24,25 @@
   List definitions of assays associated with a genotyping platform.
 }
 \usage{
-ls.assay(platform.name, assay.group='\%', show.ids=FALSE)
+ls.assay(platform.name, show.ids=FALSE)
 }
 \arguments{
   \item{platform.name}{a genotyping platform name.}
-  \item{assay.group}{an SQL \code{LIKE} expression for matching assay
-    group names.}
   \item{show.ids}{logical: indicates whether to include values of
     database keys.}
 }
 \value{
-  A data frame with one row per assay, and 4 or 6 columns:
-  \item{assay.group.id}{if \code{show.ids} is set: a unique integer key
-    for the assay group associated with this assay.}
-  \item{assay.group}{the assay group associated with this assay.}
+  A data frame with one row per assay, and 4 or 5 columns:
   \item{assay.id}{if \code{show.ids} is set: the unique integer ID for
     this assay.}
   \item{assay.name}{the assay name.}
+  \item{flags}{an integer value composed of single-bit flags.}
   \item{alleles}{a slash separated list of allele sequences.}
   \item{probe.seq}{the genomic flanking sequence for the assay, with
     the variant position denoted by an underscore (\code{'_'}).}
 }
 \seealso{
-  \code{\link{ls.assay.group}}, \code{\link{ls.assay.position}},
-  \code{\link{mk.assay}}.
+  \code{\link{ls.assay.position}}, \code{\link{mk.assay}}.
 }
 \examples{
 gt.demo.check()

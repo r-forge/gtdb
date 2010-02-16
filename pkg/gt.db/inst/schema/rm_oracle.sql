@@ -1,3 +1,23 @@
+--
+-- Copyright (C) 2009, Perlegen Sciences, Inc.
+-- Copyright (C) 2010, 23andMe, Inc.
+-- 
+-- Written by David A. Hinds <dhinds@sonic.net>
+-- 
+-- This is free software; you can redistribute it and/or modify it
+-- under the terms of the GNU General Public License as published by
+-- the Free Software Foundation; either version 3 of the license, or
+-- (at your option) any later version.
+-- 
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-- GNU General Public License for more details.
+-- 
+-- You should have received a copy of the GNU General Public License
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>
+-- 
+
 drop trigger insert_prcomp;
 drop sequence prcomp_id_seq;
 drop trigger insert_test;
@@ -20,8 +40,6 @@ drop trigger insert_mapping;
 drop sequence mapping_id_seq;
 drop trigger insert_assay;
 drop sequence assay_id_seq;
-drop trigger insert_assay_group;
-drop sequence assay_group_id_seq;
 drop trigger insert_platform;
 drop sequence platform_id_seq;
 drop table prcomp_loading;
@@ -42,6 +60,6 @@ drop table project;
 drop table assay_position;
 drop table assay_position_flag;
 drop table mapping;
+drop table assay_flag;
 drop table assay;
-drop table assay_group;
 drop table platform;

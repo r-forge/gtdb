@@ -1,5 +1,6 @@
 --
 -- Copyright (C) 2009, Perlegen Sciences, Inc.
+-- Copyright (C) 2010, 23andMe, Inc.
 -- 
 -- Written by David A. Hinds <dhinds@sonic.net>
 -- 
@@ -30,46 +31,31 @@ create table platform
   created_dt datetime
 );
 
-create table assay_group
+create table assay_flag
 (
-  assay_group_id integer primary key,
   platform_id integer not null,
-  name varchar(64) unique not null,
+  position integer not null,
+  name varchar(64) not null,
   description varchar(255),
   created_by varchar(64),
   created_dt datetime,
+  constraint af_pk primary key (platform_id, position),
+  constraint af_uniq unique (platform_id, name),
   foreign key (platform_id)
     references platform(platform_id) on delete cascade
 );
-
--- create table assay_flag
--- (
---  platform_id integer not null,
---  position integer not null,
---  name varchar(64) not null,
---  description varchar(255),
---  created_by varchar(64),
---  created_dt datetime,
---  constraint af_pk primary key (platform_id, position),
---  constraint af_uniq unique (platform_id, name),
---  foreign key (platform_id)
---    references platform(platform_id) on delete cascade
--- );
 
 create table assay
 (
   assay_id integer primary key,
   platform_id integer not null,
-  assay_group_id integer not null,
   name varchar(255) not null,
-  -- flags integer,
+  flags integer,
   alleles varchar(255),
   probe_seq varchar(255),
   constraint assay_uniq unique (platform_id, name),
   foreign key (platform_id)
-    references platform(platform_id) on delete cascade,
-  foreign key (assay_group_id)
-    references assay_group(assay_group_id) on delete cascade
+    references platform(platform_id) on delete cascade
 );
 
 create table mapping

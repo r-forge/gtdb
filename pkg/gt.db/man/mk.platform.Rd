@@ -1,5 +1,6 @@
 %
 % Copyright (C) 2009, Perlegen Sciences, Inc.
+% Copyright (C) 2010, 23andMe, Inc.
 % 
 % Written by David A. Hinds <dhinds@sonic.net>
 % 
@@ -37,7 +38,7 @@ If successful, the number of rows inserted in or removed from the
 platform table (i.e., 1). 
 }
 \seealso{
-  \code{\link{ls.platform}}, \code{\link{mk.assay.group}}.
+  \code{\link{ls.platform}}.
 }
 \examples{\dontrun{
 mk.platform('GT_800K', 'My 800K Genotyping Platform')

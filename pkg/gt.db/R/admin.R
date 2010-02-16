@@ -62,8 +62,6 @@ ls.platform <- function(platform.name='%', show.ids=FALSE)
 {
     sql <-
      "select platform_id, name platform_name, description,
-             (select count(*) from assay_group g
-              where p.platform_id=g.platform_id) assay_groups,
              (select count(*) from dataset d
               where p.platform_id=d.platform_id) datasets,
              created_by, created_dt

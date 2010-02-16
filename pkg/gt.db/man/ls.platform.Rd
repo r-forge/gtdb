@@ -1,5 +1,6 @@
 %
 % Copyright (C) 2009, Perlegen Sciences, Inc.
+% Copyright (C) 2010, 23andMe, Inc.
 % 
 % Written by David A. Hinds <dhinds@sonic.net>
 % 
@@ -33,12 +34,11 @@ ls.platform(platform.name='\%', show.ids=FALSE)
     database keys.}
 }
 \value{
-  A data frame with one row per platform, and 6 or 7 columns:
+  A data frame with one row per platform, and 5 or 6 columns:
   \item{platform.id}{if \code{show.ids} is set: a unique integer key
     for this platform.}
   \item{platform.name}{a short, unique identifier for the platform.}
   \item{description}{a free-text description of the platform.}
-  \item{assay.groups}{the number of assay groups for this platform.}
   \item{datasets}{a count of the number of datasets using this platform.}
   \item{created.by}{the user name that created the platform.}
   \item{created.dt}{the creation date of the platform.}
