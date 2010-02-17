@@ -71,7 +71,7 @@ function(dataset.name, mapping.name, assay.name, dbsnp.rsid,
         sql <- paste(sql, 'and a.name=:3')
         dat <- .sql.prep.data(dset.id, map.id, assay.name)
     } else if (!missing(dbsnp.rsid)) {
-        sql <- paste(sql, 'and dbsnp.rsid=:3')
+        sql <- paste(sql, 'and dbsnp_rsid=:3')
         dat <- .sql.prep.data(dset.id, map.id, dbsnp.rsid)
     } else if (!missing(part)) {
         by <- match.arg(by)
