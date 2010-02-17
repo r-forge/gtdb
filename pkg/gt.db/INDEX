@@ -47,6 +47,7 @@ keep.attr               Keep User Attributes
 ld.gt.data              Compute Pairwise Linkage Disequilibrium
 ld.plot                 Pairwise Linkage Disequilibrium Plot
 ld.prune                Prune SNP List to Limit Linkage Disequilibrium
+load.affy.chp.data      Import Affymetrix CHP Genotype Data
 ls.assay                List Assay Definitions
 ls.assay.position       List Assay Positions
 ls.dataset              List Genotype Datasets
@@ -92,6 +93,7 @@ progress.bar            Console Text-Based Progress Bar
 qqprcomp                Quantile-Quantile Plots of PCA Loadings
 qqpval                  Quantile-Quantile Plots for P Values
 qqthin                  Sparse Normal Quantile-Quantile Plots
+read.affy.anno          Import Affymetrix NetAffx Annotation Data
 reshape.gt.data         Reshape Genotype Data
 revcomp                 Reverse Complement DNA Sequences
 score.and.store         Test SNPs for Association and Store Results
