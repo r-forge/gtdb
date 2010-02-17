@@ -19,10 +19,10 @@
 
 #---------------------------------------------------------------------
 
-.unpack.signal <- function(data)
+.unpack.signal <- function(raw)
 {
-    nr <- length(data)/4
-    i <- readBin(data, what='int', n=2*nr, size=2,
+    nr <- length(raw)/4
+    i <- readBin(raw, what='int', n=2*nr, size=2,
                  signed=FALSE, endian='little')
     i <- na.if(i, 65535)
     dim(i) <- c(2,nr)
@@ -31,9 +31,9 @@
 
 .pack.signal <- function(data)
 {
-    a <- writeBin(if.na(data$signal.a,65535),
+    a <- writeBin(as.integer(if.na(data$signal.a,65535)),
                   raw(), size=2, endian='little')
-    b <- writeBin(if.na(data$signal.b,65535),
+    b <- writeBin(as.integer(if.na(data$signal.b,65535)),
                   raw(), size=2, endian='little')
     dim(a) <- dim(b) <- c(2,nrow(data))
     as.vector(rbind(a,b))
@@ -41,9 +41,9 @@
 
 #---------------------------------------------------------------------
 
-.unpack.seqread <- function(data)
+.unpack.seqread <- function(raw)
 {
-    i <- na.if(as.integer(data), 255)
+    i <- na.if(as.integer(raw), 255)
     dim(i) <- c(4,length(i)/4)
     data.frame(fwd.a=i[1,], rev.a=i[2,], fwd.b=i[3,], rev.b=i[4,])
 }
@@ -58,15 +58,15 @@
 
 #---------------------------------------------------------------------
 
-.unpack.chpdata <- function(data)
+.unpack.chpdata <- function(raw)
 {
-    nr <- length(data)/5
-    dim(data) <- c(5,nr)
-    i <- readBin(data[1:2,], what='int', n=nr, size=2,
+    nr <- length(raw)/5
+    dim(raw) <- c(5,nr)
+    i <- readBin(raw[1:2,], what='int', n=nr, size=2,
                  signed=TRUE, endian='little')
-    j <- readBin(data[3:4,], what='int', n=nr, size=2,
+    j <- readBin(raw[3:4,], what='int', n=nr, size=2,
                  signed=FALSE, endian='little')
-    k <- factor(as.integer(data[5,]), levels=1:4,
+    k <- factor(as.integer(raw[5,]), levels=1:4,
                 labels=c('a','h','b','n'))
     data.frame(log.ratio=i/256, strength=j/256, forced.call=k)
 }
@@ -77,21 +77,21 @@
                   raw(), size=2, endian='little')
     y <- writeBin(as.integer(round(256*data$strength)),
                   raw(), size=2, endian='little')
-    z <- as.raw(data$forced.call)
+    z <- as.raw(factor(data$forced.call, levels=c('a','h','b','n')))
     dim(x) <- dim(y) <- c(2,nrow(data))
     as.vector(rbind(x,y,z))
 }
 
 #---------------------------------------------------------------------
 
-unpack.raw.data <- function(data, raw.layout)
+unpack.raw.data <- function(raw, raw.layout)
 {
     if (raw.layout == 'signal') {
-        .unpack.signal(data)
+        .unpack.signal(raw)
     } else if (raw.layout == 'seqread') {
-        .unpack.seqread(data)
+        .unpack.seqread(raw)
     } else if (raw.layout == 'chpdata') {
-        .unpack.chpdata(data)
+        .unpack.chpdata(raw)
     } else {
         stop('unknown raw data layout')
     }

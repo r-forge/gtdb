@@ -149,7 +149,7 @@ lookup.id <- function(table, name, ..., use.index)
         x <- sql.query(gt.db::.gt.db, sql, ...)
     }
     if (nrow(x)) {
-        if (any(table(x[,1]) > 1))
+        if (length(unique(x[,1])) < nrow(x))
             stop('lookup failed: please be more specific', call.=FALSE)
         r <- x[match(name,x[,1]),2]
         f <- name[is.na(r)]

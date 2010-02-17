@@ -51,7 +51,7 @@ reshape.gt.data(gt.data, ...)
 }
 \seealso{
   \code{\link{fetch.gt.data}}, \code{\link{unpack.gt.matrix}},
-  \code{\link{gt.split}}.
+  \code{\link{gt.split}}, \code{\link{unpack.raw.data}}.
 }
 \examples{
 gt.demo.check()

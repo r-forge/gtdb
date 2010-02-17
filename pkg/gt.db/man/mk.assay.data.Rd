@@ -41,8 +41,8 @@ mk.assay.data(dataset.name, data, progress=FALSE)
     \item{assay.id}{the unique integer ID for this assay.}
     \item{flags}{an integer value composed of single-bit flags.}
     \item{genotype}{a string of a/h/b/n/x genotypes.}
-    \item{qscore}{a string of packed quality scores.}
-    \item{raw.data}{a string containing packed raw data (such as
+    \item{qscore}{a hex string of packed quality scores.}
+    \item{raw.data}{a hex string containing packed raw data (such as
       signal intensities or read counts).}
   }
   An \code{assay.name} column can be supplied in place of
@@ -63,7 +63,9 @@ mk.assay.data(dataset.name, data, progress=FALSE)
 \seealso{
   \code{\link{mk.assay.position}},
   \code{\link{mk.assay}},
-  \code{\link{fetch.gt.data}}.
+  \code{\link{fetch.gt.data}},
+  \code{\link{pack.raw.data}},
+  \code{\link{unpack.raw.data}}.
 }
 \examples{\dontrun{
 data(demo_01)

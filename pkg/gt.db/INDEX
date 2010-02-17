@@ -48,7 +48,6 @@ ld.gt.data              Compute Pairwise Linkage Disequilibrium
 ld.plot                 Pairwise Linkage Disequilibrium Plot
 ld.prune                Prune SNP List to Limit Linkage Disequilibrium
 ls.assay                List Assay Definitions
-ls.assay.group          List Assay Groups
 ls.assay.position       List Assay Positions
 ls.dataset              List Genotype Datasets
 ls.mapping              List Assay Mapping Sets
@@ -63,7 +62,6 @@ mask.str                Mask Character Strings
 match.gt.data           Identify Equivalent Genotyping Assays
 mk.assay                Create Genotyping Assay Definitions
 mk.assay.data           Create Genotyping Assay Data
-mk.assay.group          Create or Remove a Genotype Assay Group
 mk.assay.position       Create Genotyping Assay Positions
 mk.attr                 Create, Remove, and List Attribute Definitions
 mk.dataset              Create or Remove Genotype Datasets
@@ -82,6 +80,7 @@ nsubstr                 Count Substring Instances
 nw.align                Needleman and Wunsch Sequence Alignment
 nw.orient.assay         Orient Assay Sequences
 orient.gt.data          Flip Assay Strands and/or Swap Alleles
+pack.raw.data           Pack and Unpack Raw Genotype Data
 panel.cluster           Panel Function for Drawing Elliptical Cluster
                         Boundaries
 panel.qqpval            Quantile-Quantile Plots for P Values: Panel
