@@ -20,9 +20,14 @@
 # Code to handle importing Affymetrix SNP annotations and genotype
 # data into GT.DB
 
-.read.affy.header <- function(file, max.lines=10000)
+.read.affy.header <- function(file)
 {
-    txt <- grep('^\\#%.*=', readLines(file, max.lines), value=TRUE)
+    txt <- character()
+    repeat {
+        x <- grep('^\\#%.*=', readLines(file, 100), value=TRUE)
+        if (!length(x)) break;
+        txt <- c(txt,x)
+    }
     val <- sub('^..[^=]*=(.*)', '\\1', txt)
     structure(val, names=sub('^..([^=]*)=.*', '\\1', txt))
 }
@@ -60,7 +65,7 @@ read.affy.anno <- function(file)
     ploidy[anno$Chromosome=='Y'] <- 'Y'
     ploidy[anno$Chromosome=='MT'] <- 'M'
     ploidy[anno$ChrX.pseudo.autosomal.region.1 |
-             anno$ChrX.pseudo.autosomal.region.2] <- 'A'
+           anno$ChrX.pseudo.autosomal.region.2] <- 'A'
     dbsnp.orient <-
         factor(anno$Strand.Versus.dbSNP,
                levels=c('reverse','same'), labels=c('-','+'))

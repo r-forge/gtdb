@@ -1,5 +1,6 @@
 %
 % Copyright (C) 2009, Perlegen Sciences, Inc.
+% Copyright (C) 2010, 23andMe, Inc.
 % 
 % Written by David A. Hinds <dhinds@sonic.net>
 % 
@@ -24,10 +25,13 @@
   platform.
 }
 \usage{
-ls.mapping(platform.name, show.all=FALSE, show.ids=FALSE)
+ls.mapping(platform.name, mapping.name='\%',
+           show.all=FALSE, show.ids=FALSE)
 }
 \arguments{
   \item{platform.name}{a genotyping platform name.}
+  \item{mapping.name}{an SQL \code{LIKE} expression for matching
+    mapping names.}
   \item{show.all}{logical: indicates if hidden mapping sets should be
     included in the output.}
   \item{show.ids}{logical: indicates whether to include values of

@@ -46,12 +46,12 @@ hexToRaw <- function(hex, drop=TRUE)
 
 .check.name <- function(name)
 {
-    r <- (regexpr('^[A-Za-z0-9_.]+$', name) < 0)
-    if (sum(r) == 1) {
-        stop("invalid name '", name, "'", call.=FALSE)
-    } else if (sum(r)) {
-        stop("invalid names '", name[1], "', '", name[2],
-             ifelse(sum(r)>2, "', ...", "'"), call.=FALSE)
+    bad <- name[regexpr('^[A-Za-z0-9_.]+$', name) < 0]
+    if (length(bad) == 1) {
+        stop("invalid name '", bad, "'", call.=FALSE)
+    } else if (length(bad)) {
+        stop("invalid names '", bad[1], "', '", bad[2],
+             ifelse(length(bad)>2, "', ...", "'"), call.=FALSE)
     }
 }
 
@@ -149,7 +149,7 @@ lookup.id <- function(table, name, ..., use.index)
         x <- sql.query(gt.db::.gt.db, sql, ...)
     }
     if (nrow(x)) {
-        if (length(unique(x[,1])) < nrow(x))
+        if (anyDuplicated(x[,1]))
             stop('lookup failed: please be more specific', call.=FALSE)
         r <- x[match(name,x[,1]),2]
         f <- name[is.na(r)]

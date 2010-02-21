@@ -21,16 +21,18 @@
 #---------------------------------------------------------------------
 
 ls.mapping <-
-function(platform.name, show.all=FALSE, show.ids=FALSE)
+function(platform.name, mapping.name='%',
+         show.all=FALSE, show.ids=FALSE)
 {
     sql <-
      'select mapping_id, name mapping_name, description,
         assembly, is_hidden, created_by, created_dt
       from mapping
       where platform_id=:1
-        and is_hidden<=:2'
+        and name like :2
+        and is_hidden<=:3'
     r <- sql.query(gt.db::.gt.db, sql, lookup.id('platform', platform.name),
-                   show.all)
+                   mapping.name, show.all)
     .filter.ids(r, show.ids)
 }
 
@@ -87,6 +89,7 @@ mk.assay <- function(platform.name, data, progress=FALSE)
     if (any(r,na.rm=TRUE))
         stop("invalid probe sequence(s)", call.=FALSE)
     if (is.null(data$flags)) data$flags <- 0
+    if (is.null(data$probe.seq)) data$probe.seq <- NA
     sql <- 'insert into assay values (null,:1,:2,:3,:4,:5)'
     sql.exec(gt.db::.gt.db, sql, plat.id,
              data[c('assay.name','flags','alleles','probe.seq')],
@@ -133,6 +136,8 @@ function(platform.name, mapping.name, data, progress=FALSE)
         data$ploidy <- NA
     }
     data$ploidy <- .fixup.ploidy(data$ploidy)
+    if (is.null(data$dbsnp.rsid)) data$dbsnp.rsid <- NA
+    if (is.null(data$dbsnp.orient)) data$dbsnp.orient <- NA
     sql.exec(gt.db::.gt.db, sql, map.id,
              data[c('assay.id', 'scaffold', 'position', 'strand',
                     'ploidy', 'dbsnp.rsid', 'dbsnp.orient')],
@@ -156,7 +161,8 @@ mk.assay.data <- function(dataset.name, data, progress=FALSE)
 
     db.mode <- .gt.db.options('db.mode')
     tx.mode <- .gt.db.options('tx.mode')
-    if (db.mode == tx.mode) {
+    if ((db.mode == tx.mode) ||
+        all(is.na(data$qscore) && is.na(data$raw.data))) {
         cvt.fn <- ''
     } else if (db.mode == 'raw' && tx.mode == 'hex') {
         cvt.fn <- ':unhex:'

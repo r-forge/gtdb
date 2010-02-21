@@ -39,8 +39,8 @@ mk.assay(platform.name, data, progress=FALSE)
     \item{assay.name}{a unique name (within this platform) for the assay.}
     \item{flags}{an optional integer value composed of single-bit flags.}
     \item{alleles}{a slash separated list of valid alleles.}
-    \item{probe.seq}{the genomic flanking sequence for the assay, with
-      the variant position denoted by an underscore (\code{'_'}).}
+    \item{probe.seq}{an optional genomic flanking sequence for the assay,
+      with the variant position denoted by an underscore (\code{'_'}).}
   }
 }
 \value{
