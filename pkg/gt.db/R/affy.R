@@ -23,11 +23,13 @@
 .read.affy.header <- function(file)
 {
     txt <- character()
+    fd <- file(file, 'rt')
     repeat {
-        x <- grep('^\\#%.*=', readLines(file, 100), value=TRUE)
-        if (!length(x)) break;
+        x <- grep('^\\#%.*=', readLines(fd, 100), value=TRUE)
+        if (!length(x)) break
         txt <- c(txt,x)
     }
+    close(fd)
     val <- sub('^..[^=]*=(.*)', '\\1', txt)
     structure(val, names=sub('^..([^=]*)=.*', '\\1', txt))
 }
@@ -84,7 +86,7 @@ read.affy.anno <- function(file)
 load.affy.platform <- function(anno, description, progress=TRUE)
 {
     platform <- attr(anno,'chip_type')
-    cat(sprintf("Creating platform '%s'...\n", platform))
+    message("Creating platform '", platform, "'...")
     mk.platform(platform, description)
     mk.assay(platform, .parse.affy.assays(anno), progress=progress)
 }
@@ -94,8 +96,7 @@ load.affy.mapping <- function(anno, progress=TRUE)
     platform <- attr(anno,'chip_type')
     version <- attr(anno, 'netaffx-annotation-netaffx-build')
     mapping <- sprintf('na%s', version)
-    cat(sprintf("Creating mapping '%s' for '%s'...\n",
-                mapping, platform))
+    message("Creating mapping '", mapping, "' for '", platform, "'...")
     ncbi.build <- attr(anno, 'genome-version-ncbi')
     dbsnp.build <- attr(anno, 'dbsnp-version')
     desc <- sprintf("%s on NCBI b%s, dbSNP b%s",
@@ -113,7 +114,7 @@ load.affy.mapping <- function(anno, progress=TRUE)
 # read a single Affy CHP file (in text form) and convert individual
 # genotypes to a GT.DB representation
 
-.read.affy.chp <- function(file, names, row.names=TRUE)
+.read.affy.chp <- function(file, probes, row.names=TRUE)
 {
     recode.gt <- function(x)
     {
@@ -122,12 +123,14 @@ load.affy.mapping <- function(anno, progress=TRUE)
     }
 
     cc <- c('character','factor',rep('numeric',3),'factor')
-    d <- read.table(file, sep='\t', header=TRUE,
+    tc <- textConnection(readChar(file, nchars=1e8, useBytes=TRUE))
+    d <- read.table(tc, sep='\t', header=TRUE,
                     row.names=1, colClasses=cc)
-    if (!missing(names)) {
-        if (!all(names %in% rownames(d)))
+    close(tc)
+    if (!missing(probes)) {
+        if (!all(probes %in% rownames(d)))
             stop('Probe set name(s) are not matched?')
-        d <- d[names,]
+        d <- d[probes,]
     }
     if (!row.names) row.names(d) <- NULL
 
@@ -135,7 +138,7 @@ load.affy.mapping <- function(anno, progress=TRUE)
     d$forced.call <- recode.gt(d$forced.call)
     qscore <- round(-10*log10(d$confidence))
     qscore <- ifelse(is.finite(qscore), qscore, 0)
-    raw.data <- rawToHex(matrix(.pack.chpdata(d), nrow=5))
+    raw.data <- rawToHex(matrix(.pack.chpdata(d), ncol=nrow(d)))
     data.frame(genotype=recode.gt(d$call),
                qscore=as.integer(qscore),
                raw.data=raw.data,
@@ -148,9 +151,9 @@ load.affy.mapping <- function(anno, progress=TRUE)
 # transposing the data to the form that will go into GT.DB
 
 .reorg.chp.data <-
-    function(files, names, slice=8192, progress=TRUE)
+    function(files, probes, slice=8192, progress=TRUE)
 {
-    nr <- nrow(.read.affy.chp(files[1], names))
+    nr <- nrow(.read.affy.chp(files[1], probes))
     lo <- seq(1, nr, slice)
     hi <- c(lo[-1]-1, nr)
     nb <- length(lo)
@@ -162,7 +165,7 @@ load.affy.mapping <- function(anno, progress=TRUE)
     nf <- length(files)
     if (progress) progress.bar(0, nf)
     for (n in 1:nf) {
-        d <- .read.affy.chp(files[n], names, row.names=(n==1))
+        d <- .read.affy.chp(files[n], probes, row.names=(n==1))
         sapply(1:nb, function(x)
            { slice <- d[lo[x]:hi[x],]
              save(slice, file=fd[[x]]) })
@@ -184,7 +187,7 @@ load.affy.mapping <- function(anno, progress=TRUE)
         else
             apply(m, 2, function(x) rawToHex(writeBin(x,raw(0),...)))
     }
-    load.one <- function(fd)
+    load.obj <- function(fd)
     {
         tmpenv <- new.env(parent=emptyenv())
         name <- load(fd, tmpenv)
@@ -192,8 +195,8 @@ load.affy.mapping <- function(anno, progress=TRUE)
     }
 
     fd <- gzfile(file, 'rb')
-    files <- load.one(fd)
-    d <- replicate(length(files), load.one(fd), simplify=FALSE)
+    files <- load.obj(fd)
+    d <- replicate(length(files), load.obj(fd), simplify=FALSE)
     close(fd)
     data.frame(assay.name=sub('-','_',row.names(d[[1]])),
                genotype=pack.by.assay(d,'genotype'),
@@ -204,9 +207,9 @@ load.affy.mapping <- function(anno, progress=TRUE)
 
 load.affy.chp.data <- function(dataset, anno, files, progress=TRUE)
 {
-    cat("Reorganizing CHP data...\n")
+    message("Reorganizing CHP data...")
     parts <- .reorg.chp.data(files, rownames(anno), progress=progress)
-    cat("Loading data into database...\n")
+    message("Loading data into database...")
     if (progress) progress.bar(0, length(parts))
     for (n in 1:length(parts)) {
         d <- .reshape.affy.block(parts[n])

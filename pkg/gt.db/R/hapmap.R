@@ -25,9 +25,9 @@
 
 .read.hapmap.file <- function(file)
 {
-    # schlep the whole file into memory
+    # schlep the whole file into memory: 100 MB should be enough
     fd <- file(file)
-    filedata <- readChar(fd,100000000,TRUE)
+    filedata <- readChar(file, nchars=1e8, useBytes=TRUE)
     close(fd)
 
     # parse just map information
@@ -102,14 +102,20 @@ load.hapmap.data <-
     dataset <- paste(platform, mapping, f$ver[1], sep='_')
     if (npop == 1) dataset <- paste(dataset, f$pop[1], sep='_')
     desc <- sprintf('HapMap Phase %d', phase)
-    if (!nrow(ls.platform(platform)))
+    if (!nrow(ls.platform(platform))) {
+        message("Creating platform '", platform, "'...")
         mk.platform(platform, desc)
+    }
     desc <- sprintf('%s Release %s', desc, f$rel[1])
-    if (!nrow(ls.mapping(platform, mapping)))
+    if (!nrow(ls.mapping(platform, mapping))) {
+        message("Creating mapping '", mapping, "'...")
         mk.mapping(platform, mapping, desc, sprintf('ncbi_%s', f$build[1]))
+    }
     desc <- sprintf('%s (%s)', desc, f$ver[1])
-    if (!nrow(ls.dataset(project.name, dataset)))
+    if (!nrow(ls.dataset(project.name, dataset))) {
+        message("Creating dataset '", dataset, "'...")
         mk.dataset(dataset, project.name, platform, desc)
+    }
 
     for (chr in levels(.sort.levels(f$chr))) {
         m <- .merge.hapmap.files(sort(files[f$chr == chr]), verbose)
