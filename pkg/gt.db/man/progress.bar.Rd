@@ -25,12 +25,12 @@
   elapsed time and estimated time remaining are also reported.
 }
 \usage{
-progress.bar(done, total, len = 40)
+progress.bar(done, total, width=getOption('width'))
 }
 \arguments{
   \item{done}{the amount of work already done.}
   \item{total}{the total amount of work to do.}
-  \item{len}{the length of the bar, in characters.}
+  \item{width}{the console width, in characters.}
 }
 \details{
   After writing the progress bar, the cursor is repositioned at the

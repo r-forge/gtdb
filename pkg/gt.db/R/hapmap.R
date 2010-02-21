@@ -47,7 +47,7 @@
     geno <- sub('.* QC\\S+ ', '', geno, perl=TRUE)
     sample <- strsplit(geno[1], ' ')[[1]]
     map$genotype <- .Call('do_encode_gt', as.character(map$alleles),
-                          geno[1+(1:nrow(map))])
+                          geno[1+(1:nrow(map))], PACKAGE='gt.db')
     stopifnot(all(nchar(map$genotype) == length(sample)))
     structure(map, sample=sample)
 }

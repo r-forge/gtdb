@@ -24,7 +24,7 @@
   International HapMap Project.
 }
 \usage{
-load.hapmap.data(files, project='HapMap', verbose=TRUE)
+load.hapmap.data(files, project.name='HapMap', verbose=TRUE)
 }
 \arguments{
   \item{files}{a vector of HapMap genotype data files.}

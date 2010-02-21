@@ -18,8 +18,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 
-progress.bar <- function (done, total, len=options('width')-40)
+progress.bar <- function (done, total, width=getOption('width'))
 {
+    len <- width - 40
     now <- Sys.time()
     p <- try(get(".Progress", pos='package:gt.db'), silent=TRUE)
     if ((class(p) == 'try-error') || (done == 0)) {
