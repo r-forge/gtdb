@@ -1,3 +1,4 @@
+
 #
 # Copyright (C) 2010, 23andMe, Inc.
 #
@@ -24,27 +25,29 @@
 
 .read.hapmap.file <- function(file)
 {
-    # read just map information
-    map <- scan(file, what=list('','','',1L,''),
+    # schlep the whole file into memory
+    fd <- file(file)
+    filedata <- readChar(fd,100000000,TRUE)
+    close(fd)
+
+    # parse just map information
+    tc <- textConnection(filedata)
+    map <- scan(tc, what=list('','','',1L,''),
                 flush=TRUE, skip=1, quiet=TRUE)
+    close(tc)
     names(map) <- c('assay.name','alleles','scaffold','position','strand')
     map$assay.name <- I(gsub('-','_',map$assay.name))
     map$scaffold <- sub('MT','M',map$scaffold)
     map <- as.data.frame(map)
 
     # now parse genotype data
-    geno <- readLines(file)
-    # note that we keep the leading space
-    geno <- sub('.* QC[^ ]+', '', geno, perl=TRUE)
-    sample <- strsplit(geno[1], ' ')[[1]][-1]
-    geno <- geno[-1]
-    for (a in levels(map$alleles)) {
-        w <- (map$alleles == a)
-        ab <- strsplit(a,'/')[[1]]
-        geno[w] <- chartr(sprintf('%s%sN',ab[1],ab[2]),'abn',geno[w])
-    }
-    geno <- gsub(' ab| ba', 'h', geno, perl=TRUE)
-    map$genotype <- gsub(' .', '', geno, perl=TRUE)
+    tc <- textConnection(filedata)
+    geno <- readLines(tc)
+    close(tc)
+    geno <- sub('.* QC\\S+ ', '', geno, perl=TRUE)
+    sample <- strsplit(geno[1], ' ')[[1]]
+    map$genotype <- .Call('do_encode_gt', as.character(map$alleles),
+                          geno[1+(1:nrow(map))])
     stopifnot(all(nchar(map$genotype) == length(sample)))
     structure(map, sample=sample)
 }
@@ -60,6 +63,7 @@
     all <- lapply(files, wrap.read.file)
 
     # construct unified map
+    if (verbose) message('Merging...')
     map <- do.call('rbind', lapply(all, '[', -6))
     map <- unique(map)
     map <- map[order(map$position),]
@@ -126,8 +130,8 @@ load.hapmap.data <-
         # FIXME: we'll need to fix up pseudo-autosomal regions
         m$ploidy <- switch(chr, 'chrX'='X', 'chrY'='Y', 'chrMT'='M', 'A')
         if (verbose) message("Loading ", nrow(m), " records...")
-        mk.assay(platform, m)
-        mk.assay.position(platform, mapping, m)
-        mk.assay.data(dataset, m)
+        mk.assay(platform, m, progress=verbose)
+        mk.assay.position(platform, mapping, m, progress=verbose)
+        mk.assay.data(dataset, m, progress=verbose)
     }
 }
