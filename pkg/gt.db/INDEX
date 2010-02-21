@@ -48,6 +48,7 @@ ld.gt.data              Compute Pairwise Linkage Disequilibrium
 ld.plot                 Pairwise Linkage Disequilibrium Plot
 ld.prune                Prune SNP List to Limit Linkage Disequilibrium
 load.affy.chp.data      Import Affymetrix CHP Genotype Data
+load.hapmap.data        Import Unphased HapMap Genotype Data
 ls.assay                List Assay Definitions
 ls.assay.position       List Assay Positions
 ls.dataset              List Genotype Datasets
