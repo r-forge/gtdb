@@ -32,10 +32,11 @@ load.hapmap.data(files, project.name='HapMap', verbose=TRUE)
   \item{verbose}{logical: indicates whether to report progress.}
 }
 \details{
-  This function supports loading recent Phase 2 and Phase 3 genotype
-  files.  If files include data from several population panels, then the
-  genotype data is merged into a single dataset spanning all those
-  panels.  Only non-redundant forward-orientation files are supported.
+  This function supports loading recent HapMap Phase II and Phase III
+  genotype files.  If files include data from several population panels,
+  then the genotype data is merged into a single dataset spanning all
+  those panels.  Only non-redundant forward-orientation files are
+  supported.
 }
 \seealso{
   \code{\link{hapmap.subjects}}.

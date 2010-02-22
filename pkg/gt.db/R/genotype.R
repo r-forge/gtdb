@@ -52,9 +52,9 @@ function(dataset.name, mapping.name, assay.name, dbsnp.rsid,
     if (genotype)
         sql <- paste(sql, ', :clob:(genotype)')
     if (qscore)
-        sql <- paste(sql, ', ', cvt.fn, '(qscore)', sep='')
+        sql <- sprintf("%s, %s(qscore)", sql, cvt.fn)
     if (raw.data)
-        sql <- paste(sql, ', ', cvt.fn, '(raw_data)', sep='')
+        sql <- sprintf("%s, %s(raw_data)", sql, cvt.fn)
 
     sql <- paste(sql,
      'from assay_data d, assay a, assay_position p
