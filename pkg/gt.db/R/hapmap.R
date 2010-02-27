@@ -1,4 +1,3 @@
-
 #
 # Copyright (C) 2010, 23andMe, Inc.
 #
@@ -25,9 +24,9 @@
 
 .read.hapmap.file <- function(file)
 {
-    # schlep the whole file into memory: 100 MB should be enough
-    fd <- file(file)
-    filedata <- readChar(file, nchars=1e8, useBytes=TRUE)
+    # schlep the whole file into memory: 250 MB should be enough
+    fd <- file(file, "r")
+    filedata <- readChar(fd, nchars=250e6, useBytes=TRUE)
     close(fd)
 
     # parse just map information
