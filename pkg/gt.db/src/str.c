@@ -145,7 +145,7 @@ SEXP do_ch_table(SEXP ss, SEXP sch)
 	for (i = 0; i < ns; i++) {
 		if (STRING_ELT(ss,i) == NA_STRING) {
 			for (j = 0; j < nc; j++)
-				ians[nc*i+j] = NA_INTEGER;
+				ians[i+ns*j] = NA_INTEGER;
 		} else {
 			s = CHAR(STRING_ELT(ss,i));
 			len = strlen(s);
@@ -199,7 +199,7 @@ SEXP do_ch_table_2(SEXP ss1, SEXP ss2, SEXP sch)
 		if (STRING_ELT(ss1, i1) == NA_STRING ||
 			STRING_ELT(ss2, i2) == NA_STRING) {
 			for (j = 0; j < nc*nc; j++)
-				ians[nc*nc*i+j] = NA_INTEGER;
+				ians[i+ns*j] = NA_INTEGER;
 		} else {
 			s1 = CHAR(STRING_ELT(ss1,i1));
 			s2 = CHAR(STRING_ELT(ss2,i2));

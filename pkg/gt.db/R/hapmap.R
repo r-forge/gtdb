@@ -22,6 +22,18 @@
 # We only support the 'fwd' files, which do not specify the orientations
 # of the rs clusters.  The 'rs' files contain orientation errors.
 
+.fixup.hapmap.alleles <- function(alleles, geno)
+{
+    # fill in non-SNP allele lists based on the actual data
+    bad <- grep('^[ACGT]/[ACGT]$', alleles, invert=TRUE)
+    gt <- c('A','C','G','T')
+    tbl <- (ch.table(geno[bad], chars=gt) > 0)
+    a12 <- apply(tbl, 1, function(x) c(gt[x],'?','?')[1:2])
+    alleles <- as.character(alleles)
+    alleles[bad] <- paste(a12[1,], a12[2,], sep='/')
+    factor(alleles)
+}
+
 .read.hapmap.file <- function(file)
 {
     # schlep the whole file into memory: 250 MB should be enough
@@ -41,14 +53,89 @@
 
     # now parse genotype data
     tc <- textConnection(filedata)
+    rm(filedata)
     geno <- readLines(tc)
     close(tc)
     geno <- sub('.* QC\\S+ ', '', geno, perl=TRUE)
     sample <- strsplit(geno[1], ' ')[[1]]
+    geno <- geno[1+(1:nrow(map))]
+    map$alleles <- .fixup.hapmap.alleles(map$alleles, geno)
     map$genotype <- .Call('do_encode_gt', as.character(map$alleles),
-                          geno[1+(1:nrow(map))], PACKAGE='gt.db')
-    stopifnot(all(nchar(map$genotype) == length(sample)))
+                          geno, PACKAGE='gt.db')
+
+    stopifnot(!is.na(map$genotype))
+    stopifnot(nchar(map$genotype) == length(sample))
     structure(map, sample=sample)
+}
+
+.read.hapmap.r22phased <- function(basename)
+{
+    sample <- read.table(paste(basename,'_sample.txt.gz',sep=''),
+                         header=FALSE, as.is=1)
+    sample <- paste(rep(sample[,1],each=2), c('A','B'), sep='_')
+
+    map <- read.table(paste(basename,'_legend.txt.gz',sep=''),
+                      header=TRUE, as.is=1)
+    map$strand <- factor('+')
+    map$alleles <- factor(paste(map$X0, map$X1, sep='/'))
+    map$X0 <- map$X1 <- NULL
+
+    fd <- file(paste(basename,'.phase.gz',sep=''),'r')
+    tc <- textConnection(readChar(fd, nchars=5e+08, useBytes=TRUE))
+    close(fd)
+    gt1 <- scan(tc, what=integer(), quiet=TRUE, nlines=1)
+    gt <- c(gt1,scan(tc, what=integer(), quiet=TRUE))
+    close(tc)
+    # convert from 0/1 codes to a/b strings
+    gt <- matrix(as.raw(gt+0x61), ncol=length(gt1))
+    map$genotype <- apply(gt, 2, rawToChar)
+
+    structure(map, sample = sample[1:nrow(gt)])
+}
+
+.resolve.hapmap.positions <- function(data)
+{
+    # if the same rsid appears at two positions, assign new names
+    map <- unique(do.call("rbind", lapply(data, "[", -6)))
+    bad <- map$assay.name[which(duplicated(map$assay.name))]
+    for (rsid in bad) {
+        pos <- unique(map[map$assay.name == rsid,]$position)
+        if (length(pos) > 1) {
+            warning(rsid, ": found at multiple map positions",
+                    call.=FALSE, immediate=TRUE)
+            for (i in 1:length(data)) {
+                rn <- which(data[[i]]$assay.name == rsid)
+                data[[i]]$assay.name[rn] <-
+                    paste(rsid, match(data[[i]]$position[rn], pos), sep='_')
+            }
+        }
+    }
+    data
+}
+
+.resolve.hapmap.alleles <- function(data)
+{
+    map <- unique(do.call("rbind", lapply(data, "[", -6)))
+    bad <- map$assay.name[which(duplicated(map$assay.name))]
+    for (rsid in bad) {
+        m <- map[map$assay.name == rsid,]
+        tbl <- ch.table(paste(m$alleles,collapse='/'),
+                        chars=c('A','C','G','T'))[1,]
+        a12 <- c(names(tbl[tbl>0]),'?')
+        if (length(a12) > 3)
+            stop(rsid,': more than two alleles')
+        new <- paste(a12[1], a12[2], sep='/')
+        for (i in 1:length(data)) {
+            rn <- match(rsid, data[[i]]$assay.name)
+            if (is.na(rn)) next
+            # convert B/? to A/B genotypes?
+            if (data[[i]]$alleles[rn] == sprintf('%s/?',a12[2]))
+                data[[i]]$genotype[rn] <-
+                    chartr('ab','ba',data[[i]]$genotype[rn])
+            data[[i]]$alleles[rn] <- new
+        }
+    }
+    data
 }
 
 .merge.hapmap.files <- function(files, verbose=TRUE)
@@ -61,15 +148,20 @@
     }
     all <- lapply(files, wrap.read.file)
 
-    # construct unified map
     if (verbose) message('Merging...')
-    map <- do.call('rbind', lapply(all, '[', -6))
-    map <- unique(map)
+
+    # resolve inconsistencies in positions, alleles
+    all <- .resolve.hapmap.positions(all)
+    all <- .resolve.hapmap.alleles(all)
+
+    # construct unified map
+    map <- unique(do.call('rbind', lapply(all, '[', -6)))
     map <- map[order(map$position),]
 
     # verify that all files are consistent
     stopifnot(!anyDuplicated(map$assay.name))
 
+    # concatenate genotype strings
     map$genotype <- ''
     sample <- character(0)
     for (d in all) {
