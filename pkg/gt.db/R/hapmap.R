@@ -26,6 +26,7 @@
 {
     # fill in non-SNP allele lists based on the actual data
     bad <- grep('^[ACGT]/[ACGT]$', alleles, invert=TRUE)
+    if (!length(bad)) return(alleles)
     gt <- c('A','C','G','T')
     tbl <- (ch.table(geno[bad], chars=gt) > 0)
     a12 <- apply(tbl, 1, function(x) c(gt[x],'?','?')[1:2])
@@ -42,7 +43,8 @@
     close(fd)
 
     # parse just map information
-    tc <- textConnection(filedata)
+    tc <- textConnection(gsub("(?m) ncbi_b\\d+ .*$", "",
+                              filedata, perl=TRUE))
     map <- scan(tc, what=list('','','',1L,''),
                 flush=TRUE, skip=1, quiet=TRUE)
     close(tc)
@@ -52,13 +54,10 @@
     map <- as.data.frame(map)
 
     # now parse genotype data
-    tc <- textConnection(filedata)
-    rm(filedata)
-    geno <- readLines(tc)
-    close(tc)
-    geno <- sub('.* QC\\S+ ', '', geno, perl=TRUE)
+    filedata <- gsub("(?m)^.* QC\\S+ ", "", filedata, perl=TRUE)
+    geno <- strsplit(filedata, "\n", fixed=TRUE)[[1]]
     sample <- strsplit(geno[1], ' ')[[1]]
-    geno <- geno[1+(1:nrow(map))]
+    geno <- geno[-1]
     map$alleles <- .fixup.hapmap.alleles(map$alleles, geno)
     map$genotype <- .Call('do_encode_gt', as.character(map$alleles),
                           geno, PACKAGE='gt.db')
@@ -81,7 +80,7 @@
     map$X0 <- map$X1 <- NULL
 
     fd <- file(paste(basename,'.phase.gz',sep=''),'r')
-    tc <- textConnection(readChar(fd, nchars=5e+08, useBytes=TRUE))
+    tc <- textConnection(readChar(fd, nchars=100e+06, useBytes=TRUE))
     close(fd)
     gt1 <- scan(tc, what=integer(), quiet=TRUE, nlines=1)
     gt <- c(gt1,scan(tc, what=integer(), quiet=TRUE))
