@@ -70,8 +70,7 @@ dbh <- dbConnect(dbDriver('SQLite'), fname)
   <li>Create the gt.db tables, and load up the demo datasets
 <pre>
 use.gt.db(dbh)
-init.gt.db()
-.gt.db.options(db.mode='hex')
+init.gt.db(db.mode='hex')
 demo('setup.gt.demo')
 </pre>
   </li>
