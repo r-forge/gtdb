@@ -42,19 +42,24 @@ function(dataset.name, mapping.name, assay.name, dbsnp.rsid,
     db.mode <- .gt.db.options('db.mode')
     tx.mode <- .gt.db.options('tx.mode')
     if (db.mode == tx.mode) {
-        cvt.fn <- ':blob:'
+        txt.fn <- ''
+        raw.fn <- ':blob:'
     } else if (db.mode == 'raw' && tx.mode == 'hex') {
-        cvt.fn <- ':hex.blob:'
+        txt.fn <- ''
+        raw.fn <- ':hex.blob:'
+    } else if (db.mode == 'zip' && tx.mode == 'hex') {
+        txt.fn <- 'unzip'
+        raw.fn <- ':hex.unzip.blob:'
     } else {
         stop('unknown conversion!')
     }
 
     if (genotype)
-        sql <- paste(sql, ', :clob:(genotype)')
+        sql <- sprintf("%s, %s(genotype)", sql, txt.fn)
     if (qscore)
-        sql <- sprintf("%s, %s(qscore)", sql, cvt.fn)
+        sql <- sprintf("%s, %s(qscore)", sql, raw.fn)
     if (raw.data)
-        sql <- sprintf("%s, %s(raw_data)", sql, cvt.fn)
+        sql <- sprintf("%s, %s(raw_data)", sql, raw.fn)
 
     sql <- paste(sql,
      'from assay_data d, assay a, assay_position p

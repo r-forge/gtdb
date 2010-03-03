@@ -37,6 +37,8 @@ load.hapmap.data(files, project.name='HapMap', verbose=TRUE)
   then the genotype data is merged into a single dataset spanning all
   those panels.  Only non-redundant forward-orientation files are
   supported.
+
+  It has been tested against Phase II r22 and r24, and Phase III r2.
 }
 \seealso{
   \code{\link{hapmap.subjects}}.

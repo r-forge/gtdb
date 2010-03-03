@@ -161,19 +161,24 @@ mk.assay.data <- function(dataset.name, data, progress=FALSE)
 
     db.mode <- .gt.db.options('db.mode')
     tx.mode <- .gt.db.options('tx.mode')
-    if ((db.mode == tx.mode) ||
+    if ((db.mode == tx.mode) || (db.mode == 'raw') &&
         all(is.na(data$qscore) && is.na(data$raw.data))) {
+        txt.fn <- ''
         raw.fn <- ''
     } else if (db.mode == 'raw' && tx.mode == 'hex') {
+        txt.fn <- ''
         raw.fn <- ':unhex:'
+    } else if (db.mode == 'zip' && tx.mode == 'hex') {
+        txt.fn <- ':zip:'
+        raw.fn <- ':zip.unhex:'
     } else {
         stop('unknown conversion!')
     }
 
     sql <-
      'insert into assay_data
-      values (null,:1,:2,:3,:4,%1$s(:5),%1$s(:6))'
-    sql <- sprintf(sql, raw.fn)
+      values (null,:1,:2,:3,%1$s(:4),%2$s(:5),%2$s(:6))'
+    sql <- sprintf(sql, txt.fn, raw.fn)
     cols <- c('assay.id','flags','genotype','qscore','raw.data')
     sql.exec(gt.db::.gt.db, sql, dset.id, data[cols], progress=progress)
 }

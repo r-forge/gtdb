@@ -24,13 +24,28 @@
   empty database.
 }
 \usage{
-init.gt.db()
+init.gt.db(db.mode='raw')
+}
+\arguments{
+  \item{db.mode}{storage mode for packed objects in the database: either
+    \code{'hex'}, \code{'raw'}, or \code{'zip'}.  See details.}
 }
 \details{
   This should be called after connecting to a new database using
   \code{\link[DBI:dbConnect]{dbConnect}} and \code{\link{use.gt.db}}.
   Scripts for creating GT.DB tables and indexes are installed under
   \code{library(help='gt.db')$path} in the \file{schema} subdirectory.
+
+  The \code{db.mode} argument controls how genotypes, quality scores,
+  and raw data are stored in the database.  The default (\code{'raw'})
+  is to store genotypes as character data, and quality scores and
+  underlying data as binary blobs.  In \code{'hex'} mode, quality scores
+  and underlying data are stored as strings of hex digits.  In
+  \code{'zip'} mode, all are stored in compressed form.
+
+  Without appropriate plugins, the SQLite interface supports only
+  \code{'hex'} mode.  At the moment, \code{'zip'} mode is only supported
+  in MySQL.
 }
 \seealso{
   \code{\link[DBI:dbConnect]{dbConnect}},
@@ -44,7 +59,7 @@ dbx <- dbConnect(dbDriver('SQLite'), fn)
 # unlink it so it will go away at the end of the session
 unlink(fn)
 use.gt.db(dbx)
-init.gt.db()
+init.gt.db(db.mode='hex')
 demo('setup.gt.demo')
 }}
 \keyword{database}

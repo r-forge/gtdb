@@ -18,6 +18,12 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>
 --
 
+create table gtdb_option
+(
+    name varchar(64) primary key,
+    value varchar(255)
+);
+
 --
 -- Assay Definitions and Mapping Information
 --

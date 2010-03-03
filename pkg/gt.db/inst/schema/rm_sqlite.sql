@@ -38,3 +38,4 @@ drop table mapping;
 drop table assay_flag
 drop table assay;
 drop table platform;
+drop table gtdb_option;

@@ -70,10 +70,15 @@ revcomp <- function(x)
 use.gt.db <- function(dbConnection)
 {
     assign('.gt.db', dbConnection, 'package:gt.db')
+    x <- try(sql.query(gt.db::.gt.db, 'select * from gtdb_option'),
+             silent=TRUE)
+    if (class(x) == 'data.frame') {
+        mapply(.gt.db.options, x$name, x$value)
+    }
     invisible()
 }
 
-init.gt.db <- function()
+init.gt.db <- function(db.mode='raw')
 {
     path <- library(help='gt.db')$path
     schema <- switch(class(gt.db::.gt.db),
@@ -85,6 +90,9 @@ init.gt.db <- function()
     s <- s[-grep('^--',s)]
     s <- strsplit(paste(s, collapse='\n'), ';\n')[[1]]
     sapply(s, sql.exec, db=gt.db::.gt.db, USE.NAMES=FALSE)
+    .gt.db.options(db.mode=db.mode)
+    sql.exec(gt.db::.gt.db, 'insert into gtdb_option values (?,?)',
+             'db.mode', db.mode)
 }
 
 gt.demo.check <- function()
@@ -115,8 +123,7 @@ gt.demo.check <- function()
             db <- dbConnect(dbDriver('SQLite'), fn, loadable.extensions=TRUE)
             unlink(fn)
             use.gt.db(db)
-            init.gt.db()
-            .gt.db.options(db.mode='hex')
+            init.gt.db(db.mode='hex')
             demo('setup.gt.demo')
         } else {
             stop('No GT.DB database connection', call.=FALSE)
