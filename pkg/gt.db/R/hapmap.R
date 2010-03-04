@@ -67,29 +67,31 @@
     structure(map, sample=sample)
 }
 
-.read.hapmap.r22phased <- function(basename)
+.read.hapmap.r22phased <- function(file)
 {
+    basename <- sub('\\.phased?\\.gz', '', file)
     sample <- read.table(paste(basename,'_sample.txt.gz',sep=''),
                          header=FALSE, as.is=1)
     sample <- paste(rep(sample[,1],each=2), c('A','B'), sep='_')
 
     map <- read.table(paste(basename,'_legend.txt.gz',sep=''),
                       header=TRUE, as.is=1)
+    names(map)[1] <- 'assay.name'
+    chr <- sub('genotypes_(chr\\w\\d?).*', '\\1', file, perl=TRUE)
     map$strand <- factor('+')
+    map$scaffold <- factor(chr)
     map$alleles <- factor(paste(map$X0, map$X1, sep='/'))
     map$X0 <- map$X1 <- NULL
 
-    fd <- file(paste(basename,'.phase.gz',sep=''),'r')
-    tc <- textConnection(readChar(fd, nchars=100e+06, useBytes=TRUE))
+    fd <- file(file,'r')
+    gt <- readChar(fd, nchars=100e6, useBytes=TRUE)
     close(fd)
-    gt1 <- scan(tc, what=integer(), quiet=TRUE, nlines=1)
-    gt <- c(gt1,scan(tc, what=integer(), quiet=TRUE))
-    close(tc)
-    # convert from 0/1 codes to a/b strings
-    gt <- matrix(as.raw(gt+0x61), ncol=length(gt1))
-    map$genotype <- apply(gt, 2, rawToChar)
+    gt <- chartr('01','ab',gsub(' ', '', gt, perl=TRUE))
+    gt <- strsplit(gt, '\n', fixed=TRUE)[[1]]
+    gt <- sapply(gt, charToRaw, USE.NAMES=FALSE)
+    map$genotype <- apply(t(gt), 2, rawToChar)
 
-    structure(map, sample = sample[1:nrow(gt)])
+    structure(map, sample = sample[1:ncol(gt)])
 }
 
 .resolve.hapmap.positions <- function(data)
@@ -139,11 +141,15 @@
 
 .merge.hapmap.files <- function(files, verbose=TRUE)
 {
+    read.file <- if (all(grepl('_r22_.*phase', files)))
+        .read.hapmap.r22phased
+    else
+        .read.hapmap.file
     wrap.read.file <- function(file)
     {
         part <- sub('.*(chr..?_[^_]+)_.*', '\\1', file)
         if (verbose) message('Reading ', part, '...')
-        .read.hapmap.file(file)
+        read.file(file)
     }
     all <- lapply(files, wrap.read.file)
 
@@ -173,12 +179,14 @@
 }
 
 load.hapmap.data <-
-    function(files, project.name='HapMap', verbose=TRUE)
+    function(files, project.name='HapMap', map=TRUE, verbose=TRUE)
 {
     # split filenames at '_', and at '.' unless after a digit
     f <- strsplit(basename(files), '_|(?<!\\d)\\.', perl=TRUE)
     f <- as.data.frame(do.call('rbind', f)[,1:7])
     names(f) <- c('gt','chr','pop','rel','ver','build','strand')
+    if (grepl('\\.phase', files[1]))
+        f$ver <- paste(f$ver, '_phased', sep='')
     stopifnot(f$gt == 'genotypes', f$strand == 'fwd',
               f$rel == f$rel[1], f$ver == f$ver[1],
               f$build == f$build[1])
@@ -213,8 +221,9 @@ load.hapmap.data <-
         if (!nrow(s)) {
             data(hapmap)
             sn <- attr(m,'sample')
-            s <- data.frame(sample.name=sn, subject.name=sn,
-                            gender=hapmap.subjects[sn,'gender.ref'],
+            su <- sub('(NA\\d{5}).*', '\\1', sn)
+            s <- data.frame(sample.name=sn, subject.name=su,
+                            gender=hapmap.subjects[su,'gender.ref'],
                             position=1:length(sn))
             mk.sample(dataset, s)
         } else {
@@ -226,8 +235,10 @@ load.hapmap.data <-
         # FIXME: we'll need to fix up pseudo-autosomal regions
         m$ploidy <- switch(chr, 'chrX'='X', 'chrY'='Y', 'chrMT'='M', 'A')
         if (verbose) message("Loading ", nrow(m), " records...")
-        mk.assay(platform, m, progress=verbose)
-        mk.assay.position(platform, mapping, m, progress=verbose)
+        if (map) {
+            mk.assay(platform, m, progress=verbose)
+            mk.assay.position(platform, mapping, m, progress=verbose)
+        }
         mk.assay.data(dataset, m, progress=verbose)
     }
 }

@@ -18,7 +18,7 @@
 % 
 \name{load.hapmap.data}
 \alias{load.hapmap.data}
-\title{Import Unphased HapMap Genotype Data}
+\title{Import HapMap Genotype Data}
 \description{
   Import non-redundant, forward-stranded genotype data from the 
   International HapMap Project.
@@ -38,7 +38,8 @@ load.hapmap.data(files, project.name='HapMap', verbose=TRUE)
   those panels.  Only non-redundant forward-orientation files are
   supported.
 
-  It has been tested against Phase II r22 and r24, and Phase III r2.
+  It has been tested against Phase II unphased r22 and r24, Phase II
+  phased r22, and unphased Phase III r2.
 }
 \seealso{
   \code{\link{hapmap.subjects}}.

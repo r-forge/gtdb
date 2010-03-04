@@ -91,7 +91,7 @@ init.gt.db <- function(db.mode='raw')
     s <- strsplit(paste(s, collapse='\n'), ';\n')[[1]]
     sapply(s, sql.exec, db=gt.db::.gt.db, USE.NAMES=FALSE)
     .gt.db.options(db.mode=db.mode)
-    sql.exec(gt.db::.gt.db, 'insert into gtdb_option values (?,?)',
+    sql.exec(gt.db::.gt.db, 'insert into gtdb_option values (:1,:2)',
              'db.mode', db.mode)
 }
 

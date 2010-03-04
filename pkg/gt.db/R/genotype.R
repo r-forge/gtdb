@@ -42,13 +42,13 @@ function(dataset.name, mapping.name, assay.name, dbsnp.rsid,
     db.mode <- .gt.db.options('db.mode')
     tx.mode <- .gt.db.options('tx.mode')
     if (db.mode == tx.mode) {
-        txt.fn <- ''
+        txt.fn <- ':clob:'
         raw.fn <- ':blob:'
     } else if (db.mode == 'raw' && tx.mode == 'hex') {
-        txt.fn <- ''
+        txt.fn <- ':clob:'
         raw.fn <- ':hex.blob:'
     } else if (db.mode == 'zip' && tx.mode == 'hex') {
-        txt.fn <- 'unzip'
+        txt.fn <- ':unzip.clob:'
         raw.fn <- ':hex.unzip.blob:'
     } else {
         stop('unknown conversion!')

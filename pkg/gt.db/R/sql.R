@@ -113,11 +113,11 @@
         sql <- gsub(':user:', 'user()', sql)
         sql <- gsub(':sysdate:', 'sysdate()', sql)
         sql <- gsub(':clob:\\((\\w+)\\)', '\\1', sql)
+        sql <- gsub(':unzip.clob:\\((\\w+)\\)', 'uncompress(\\1) \\1', sql)
         sql <- gsub(':blob:\\((\\w+)\\)', '\\1', sql)
         sql <- gsub(':hex.blob:\\((\\w+)\\)', 'hex(\\1) \\1', sql)
         sql <- gsub(':unhex:', 'unhex', sql)
         sql <- gsub(':zip:', 'compress', sql)
-        sql <- gsub(':unzip:', 'uncompress', sql)
         sql <- gsub(':zip.unhex:\\(([^)]+)\\)', 'compress(unhex(\\1))', sql)
         sql <- gsub(':hex.unzip.blob:\\((\\w+)\\)',
                     'hex(uncompress(\\1)) \\1', sql)
