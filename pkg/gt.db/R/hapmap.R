@@ -103,7 +103,7 @@
         pos <- unique(map[map$assay.name == rsid,]$position)
         if (length(pos) > 1) {
             warning(rsid, ": found at multiple map positions",
-                    call.=FALSE, immediate=TRUE)
+                    call.=FALSE, immediate.=TRUE)
             for (i in 1:length(data)) {
                 rn <- which(data[[i]]$assay.name == rsid)
                 data[[i]]$assay.name[rn] <-

@@ -96,7 +96,7 @@ SEXP hex_to_raw(SEXP s)
 			a = toupper(str[i]); b = toupper(str[i+1]);
 			a = (a >= 'A') ? a - 'A' + 10 : a - '0';
 			b = (b >= 'A') ? b - 'A' + 10 : b - '0';
-			RAW(ans)[j*len + i>>1] = (a<<4)+b;
+			RAW(ans)[(j*len+i)>>1] = (a<<4)+b;
 		}
 	}
 	UNPROTECT(1);

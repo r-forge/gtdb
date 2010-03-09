@@ -24,22 +24,37 @@
   International HapMap Project.
 }
 \usage{
-load.hapmap.data(files, project.name='HapMap', verbose=TRUE)
+load.hapmap.data(files, project.name='HapMap', map=TRUE, verbose=TRUE)
 }
 \arguments{
-  \item{files}{a vector of HapMap genotype data files.}
+  \item{files}{a vector of phased or unphased HapMap genotype data
+    file names.}
   \item{project.name}{the project to be associated with this data.}
+  \item{map}{logical: indicates whether to load assay and map
+    information into the database, or to assume it is already there.}
   \item{verbose}{logical: indicates whether to report progress.}
 }
 \details{
   This function supports loading recent HapMap Phase II and Phase III
-  genotype files.  If files include data from several population panels,
-  then the genotype data is merged into a single dataset spanning all
-  those panels.  Only non-redundant forward-orientation files are
-  supported.
+  genotype data.  If files include data from several population panels,
+  then the genotype data is merged by rsID into a single dataset
+  spanning all those panels.  Only non-redundant forward-orientation
+  files are supported.
 
   It has been tested against Phase II unphased r22 and r24, Phase II
-  phased r22, and unphased Phase III r2.
+  phased r22, and Phase III unphased r2.
+
+  In principle, it should be possible to define a \dQuote{Phase II}
+  platform once, and have multiple HapMap datasets refer to that
+  platform, with release-specific map information.  In practice, this is
+  challenging because releases can mix and match data from multiple
+  assays of the same SNP (i.e. CEU on one assay, JPT+CHB and YRI on
+  another).  We do not currently load the underlying assay information
+  and instead treat each rsID in a release as an \dQuote{assay}.
+
+  It is possible to load both phased and unphased datasets in the same
+  release so they refer to the same mapping.  First load the unphased
+  dataset, then load the phased data with \code{map=FALSE}.
 }
 \seealso{
   \code{\link{hapmap.subjects}}.

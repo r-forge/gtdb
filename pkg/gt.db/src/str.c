@@ -1,6 +1,7 @@
 /*
 
   Copyright (C) 2009, Perlegen Sciences, Inc.
+  Copyright (C) 2010, 23andMe, Inc.
   
   Written by David A. Hinds <dhinds@sonic.net>
   

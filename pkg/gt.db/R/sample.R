@@ -1,5 +1,6 @@
 #
 # Copyright (C) 2009, Perlegen Sciences, Inc.
+# Copyright (C) 2010, 23andMe, Inc.
 #
 # Written by David A. Hinds <dhinds@sonic.net>
 #
@@ -38,7 +39,10 @@ ls.sample <- function(dataset.name, show.ids=FALSE)
       from sample s, subject u
       where s.dataset_id=:1 and s.subject_id=u.subject_id'
     r <- sql.query(gt.db::.gt.db, sql, lookup.id('dataset', dataset.name))
-    r$gender <- .fixup.gender(r$gender)
+    if (nrow(r)) {
+        r$gender <- .fixup.gender(r$gender)
+        r <- r[order(r$position),]
+    }
     .filter.ids(data.frame(r, row.names=r$sample.name), show.ids)
 }
 

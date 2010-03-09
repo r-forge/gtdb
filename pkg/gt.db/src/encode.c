@@ -1,6 +1,6 @@
 /*
 
-  Copyright (C) 2009, 23andMe, Inc.
+  Copyright (C) 2010, 23andMe, Inc.
   
   Written by David A. Hinds <dhinds@sonic.net>
   

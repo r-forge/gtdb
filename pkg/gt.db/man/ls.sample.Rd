@@ -32,7 +32,8 @@ ls.sample(dataset.name, show.ids=FALSE)
     database keys.}
 }
 \value{
-  A data frame with one row per dataset, and 4 or 6 columns:
+  A data frame with one row per dataset, and 4 or 6 columns, sorted by
+  \code{position}:
   \item{sample.id}{if \code{show.ids} is set: the unique integer key
     for this sample.}
   \item{sample.name}{a short, unique identifier for the sample.}
