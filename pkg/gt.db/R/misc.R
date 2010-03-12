@@ -85,11 +85,12 @@ init.gt.db <- function(db.mode='raw')
                      SQLiteConnection='mk_sqlite.sql',
                      MySQLConnection='mk_mysql.sql',
                      OraConnection='mk_oracle.sql')
-    file <- paste(path, 'schema', schema, sep='/')
-    s <- scan(file, what='character', sep='&')
-    s <- s[-grep('^--',s)]
-    s <- strsplit(paste(s, collapse='\n'), ';\n')[[1]]
-    sapply(s, sql.exec, db=gt.db::.gt.db, USE.NAMES=FALSE)
+    st <- readLines(paste(path, 'schema', schema, sep='/'))
+    st <- st[!grepl('^--',st)]
+    # split into statements at ';' followed by empty line
+    st <- strsplit(paste(st, collapse='\n'), ';\n\n')[[1]]
+    st <- st[!grepl('^\\s*delimiter\\s+',st)]
+    sapply(st, sql.exec, db=gt.db::.gt.db, USE.NAMES=FALSE)
     .gt.db.options(db.mode=db.mode)
     sql.exec(gt.db::.gt.db, 'insert into gtdb_option values (:1,:2)',
              'db.mode', db.mode)

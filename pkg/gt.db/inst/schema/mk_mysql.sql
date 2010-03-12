@@ -334,3 +334,108 @@ create table prcomp_loading
     references prcomp(prcomp_id) on delete cascade,
   foreign key (sample_id) references sample(sample_id)
 );
+
+--
+-- Triggers to programmatically enforce foreign key constraints
+-- to restrict or cascade deletes, where appropriate
+--
+
+set @msg = 'Foreign key constraint violated!';
+
+create table error_msg (message varchar(128) primary key);
+
+insert into error_msg values (@msg);
+
+delimiter ;;
+
+create trigger delete_platform
+before delete on platform
+for each row begin
+  if (select count(*) from dataset where platform_id=old.platform_id)!=0 or
+     (select count(*) from mapping where platform_id=old.platform_id)!=0
+  then
+    insert error_msg values (@msg);
+  end if;
+  delete from assay where platform_id=old.platform_id;
+  delete from assay_flag where platform_id=old.platform_id;
+end;
+;;
+
+create trigger delete_mapping
+before delete on mapping
+for each row begin
+  delete from assay_position where mapping_id=old.mapping_id;
+end;
+;;
+
+create trigger delete_project
+before delete on project
+for each row begin
+  if (select count(*) from dataset where project_id=old.project_id)!=0
+  then
+    insert error_msg values (@msg);
+  end if;
+  delete from subject where project_id=old.project_id;
+  delete from subject_attr where project_id=old.project_id;
+end;
+;;
+
+create trigger delete_dataset
+before delete on dataset
+for each row begin
+  if (select count(*) from prcomp where dataset_id=old.dataset_id)!=0 or
+     (select count(*) from test where dataset_id=old.dataset_id)!=0
+  then
+    insert error_msg values (@msg);
+  end if;
+  delete from sample where dataset_id=old.dataset_id;
+  delete from sample_attr where dataset_id=old.dataset_id;
+  delete from assay_data where dataset_id=old.dataset_id;
+  delete from assay_data_flag where dataset_id=old.dataset_id;
+end;
+;;
+
+create trigger delete_subject_attr
+before delete on subject_attr
+for each row begin
+  delete from subject_value where subject_attr_id=old.subject_attr_id;
+end;
+;;
+
+create trigger delete_sample_attr
+before delete on sample_attr
+for each row begin
+  delete from sample_value where sample_attr_id=old.sample_attr_id;
+end;
+;;
+
+create trigger delete_subject
+before delete on subject
+for each row begin
+  delete from subject_value where subject_id=old.subject_id;
+end;
+;;
+
+create trigger delete_sample
+before delete on sample
+for each row begin
+  delete from sample_value where sample_id=old.sample_id;
+end;
+;;
+
+create trigger delete_test
+before delete on test
+for each row begin
+  delete from test_result where test_id=old.test_id;
+end;
+;;
+
+create trigger delete_prcomp
+before delete on prcomp
+for each row begin
+  delete from prcomp_loading where prcomp_id=old.prcomp_id;
+  delete from prcomp_component where prcomp_id=old.prcomp_id;
+end;
+;;
+
+delimiter ;
