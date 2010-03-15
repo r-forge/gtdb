@@ -34,6 +34,8 @@
 #define _(String) (String)
 #endif
 
+#define isRaw(x) (TYPEOF(x) == RAWSXP)
+
 /*---------------------------------------------------------------------*/
 
 /*
@@ -85,6 +87,89 @@ SEXP do_encode_gt(SEXP sa, SEXP sg)
 		else
 			SET_STRING_ELT(ans, i, mkChar(buf));
 	}
+	UNPROTECT(1);
+	return ans;
+}
+
+/*---------------------------------------------------------------------*/
+
+/*
+  Unpack a raw vector of packed 1/2/4-bit quantities into bytes
+*/
+
+SEXP do_unpack_bits(SEXP sr, SEXP sb)
+{
+	SEXP ans;
+	const unsigned char *src;
+	unsigned char *out, mask;
+	int i, j, nb, len, bits;
+
+	if (!isRaw(sr))
+		error(_("first argument should be a raw vector"));
+
+	bits = asInteger(sb);
+	if ((bits != 1) && (bits != 2) && (bits != 4))
+		error(_("invalid 'bits' (must be 1, 2, or 4)"));
+	nb = 8/bits;
+	mask = (1<<bits)-1;
+
+	len = LENGTH(sr);
+	PROTECT(ans = allocVector(RAWSXP, len*nb));
+	src = RAW(sr);
+	out = RAW(ans);
+
+	for (i = 0; i < len; i++, src++) {
+		unsigned char s = *src;
+		for (j = 0; j < nb; j++, out++) {
+			*out = s & mask;
+			s >>= bits;
+		}
+	}
+	UNPROTECT(1);
+	return ans;
+}
+
+/*
+  Unpack a raw vector of packed 1/2/4-bit quantities into bytes
+*/
+
+SEXP do_pack_bits(SEXP sr, SEXP sb)
+{
+	SEXP ans;
+	const unsigned char *src;
+	unsigned char *out, mask;
+	int i, j, nb, len, bits, rem;
+
+	if (!isRaw(sr))
+		error(_("first argument should be a raw vector"));
+
+	bits = asInteger(sb);
+	if ((bits != 1) && (bits != 2) && (bits != 4))
+		error(_("invalid 'bits' (must be 1, 2, or 4)"));
+	nb = 8/bits;
+	mask = (1<<bits)-1;
+
+	len = LENGTH(sr) / nb;
+	rem = LENGTH(sr) % nb;
+	PROTECT(ans = allocVector(RAWSXP, len + (rem > 0)));
+	src = RAW(sr);
+	out = RAW(ans);
+
+	for (i = 0; i < len; i++, out++) {
+		unsigned char x = 0;
+		for (j = 0; j < 8; j += nb, src++) {
+			x |= (*src & mask) << j;
+		}
+		*out = x;
+	}
+
+	if (rem) {
+		*out = 0;
+		for (i = 0; i < rem; i++, src++) {
+			*out |= (*src & mask) << (i*nb);
+		}
+	}
+
 	UNPROTECT(1);
 	return ans;
 }
