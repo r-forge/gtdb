@@ -1,26 +1,27 @@
 #
 # Copyright (C) 2009, Perlegen Sciences, Inc.
-# 
+# Copyright (C) 2010, 23andMe, Inc.
+#
 # Written by David A. Hinds <dhinds@sonic.net>
-# 
+#
 # This is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 3 of the license, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
-# 
+#
 
 prepanel.qqpval <-
-function(x, n, groups=NULL, subscripts, ...) 
+function(x, n, groups=NULL, subscripts, ...)
 {
-    yy <- -log10(range(x)[c(2,1)])
+    yy <- -log10(range(x, na.rm=TRUE)[c(2,1)])
     if (is.na(n)) {
         if (is.null(groups)) {
             n <- sum(!is.na(x))
@@ -34,7 +35,7 @@ function(x, n, groups=NULL, subscripts, ...)
 }
 
 panel.qqpval <-
-function(x, n, max.pts, groups=NULL, ...) 
+function(x, n, max.pts, groups=NULL, ...)
 {
     ffn <- function(n,z,a)
     {
@@ -77,12 +78,12 @@ function(x, ..., n=NA, max.pts=1000, prepanel=prepanel.qqpval,
         s$left$ticks$at <- -s$left$ticks$at
         s
     }
-    qqmath(x, ..., n=n, max.pts=max.pts, prepanel=prepanel, panel=panel, 
+    qqmath(x, ..., n=n, max.pts=max.pts, prepanel=prepanel, panel=panel,
            xscale.components=xs, yscale.components=ys, xlab=xlab)
 }
 
 panel.qqthin <-
-function(x, max.pts, groups=NULL, ...) 
+function(x, max.pts, groups=NULL, ...)
 {
     ffn <- function(n,z,a)
     {
@@ -110,7 +111,7 @@ function(x, max.pts, groups=NULL, ...)
     }
 }
 
-qqthin <- function(x, ..., max.pts=1000, panel=panel.qqthin) 
+qqthin <- function(x, ..., max.pts=1000, panel=panel.qqthin)
 {
     qqmath(x, ..., panel=panel, max.pts=max.pts)
 }
