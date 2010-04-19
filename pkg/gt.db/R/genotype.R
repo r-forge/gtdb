@@ -138,10 +138,11 @@ function(s, convert=c('score.b','score.a','char','none'),
     g <- factor(strsplit(s, '')[[1]], levels=lv)
     suppressWarnings(g[is.na(g)] <- 'n')
     if (convert=='char') {
+        stopifnot(length(alleles) == 2)
         if (strand=='-') alleles <- revcomp(alleles)
         na.labels <- toupper(paste(na.codes, na.codes, sep=sep))
-        la <- c(join(alleles[c(2,2)]), join(sort(alleles)),
-                join(alleles[c(1,1)]), na.labels)
+        la <- c(join(alleles[c(1,1)]), join(sort(alleles)),
+                join(alleles[c(2,2)]), na.labels)
         factor(g, levels=lv, labels=la)
     } else if (convert=='score.a') {
         g <- as.integer(g) - 1
@@ -161,11 +162,12 @@ function(v, convert=c('score.b','score.a','char','none'),
     strand <- match.arg(strand)
     join <- function(x) paste(x, collapse=sep)
     if (convert=='char') {
+        stopifnot(length(alleles) == 2)
         if (strand=='-') alleles <- revcomp(alleles)
         na.labels <- toupper(paste(na.codes, na.codes, sep=sep))
-        la <- c(join(alleles[c(2,2)]), join(alleles[c(1,2)]),
-                join(alleles[c(2,1)]), join(alleles[c(1,1)]), na.labels)
-        v <- factor(v, levels=la, labels=c('a','h','h','b', na.codes))
+        la <- c(join(alleles[c(1,1)]), join(alleles[c(1,2)]),
+                join(alleles[c(2,1)]), join(alleles[c(2,2)]), na.labels)
+        v <- factor(v, levels=la, labels=c('a','h','H','b', na.codes))
     } else if (convert=='score.a') {
         v <- factor(v, levels=c(2:0,3:6)[1:(length(na.codes)+2)],
                     labels=c('a','h','b',na.codes))
@@ -173,7 +175,7 @@ function(v, convert=c('score.b','score.a','char','none'),
         v <- factor(v, levels=0:(length(na.codes)+2),
                     labels=c('a','h','b',na.codes))
     }
-    paste(if.na(as.character(v),'n'), collapse='')
+    tolower(paste(if.na(as.character(v),'n'), collapse=''))
 }
 
 #---------------------------------------------------------------------
