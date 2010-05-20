@@ -59,7 +59,9 @@ create table assay
   flags integer,
   alleles varchar(255),
   probe_seq varchar(255),
+  alt_name varchar(255),
   constraint assay_uniq unique (platform_id, name),
+  constraint assay_alt_uniq unique (platform_id, alt_name),
   foreign key (platform_id)
     references platform(platform_id) on delete cascade
 );

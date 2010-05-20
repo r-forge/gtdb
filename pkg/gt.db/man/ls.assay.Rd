@@ -32,7 +32,7 @@ ls.assay(platform.name, show.ids=FALSE)
     database keys.}
 }
 \value{
-  A data frame with one row per assay, and 4 or 5 columns:
+  A data frame with one row per assay, and up to 6 columns:
   \item{assay.id}{if \code{show.ids} is set: the unique integer ID for
     this assay.}
   \item{assay.name}{the assay name.}
@@ -40,6 +40,7 @@ ls.assay(platform.name, show.ids=FALSE)
   \item{alleles}{a slash separated list of allele sequences.}
   \item{probe.seq}{the genomic flanking sequence for the assay, with
     the variant position denoted by an underscore (\code{'_'}).}
+  \item{alt.name}{an alternate name for the assay, if available.}
 }
 \seealso{
   \code{\link{ls.assay.position}}, \code{\link{mk.assay}}.

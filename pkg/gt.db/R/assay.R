@@ -90,9 +90,10 @@ mk.assay <- function(platform.name, data, progress=FALSE)
         stop("invalid probe sequence(s)", call.=FALSE)
     if (is.null(data$flags)) data$flags <- 0
     if (is.null(data$probe.seq)) data$probe.seq <- NA
-    sql <- 'insert into assay values (null,:1,:2,:3,:4,:5)'
+    if (is.null(data$alt.name)) data$alt.name <- NA
+    sql <- 'insert into assay values (null,:1,:2,:3,:4,:5,:6)'
     sql.exec(gt.db::.gt.db, sql, plat.id,
-             data[c('assay.name','flags','alleles','probe.seq')],
+             data[c('assay.name','flags','alleles','probe.seq','alt.name')],
              progress=progress)
 }
 
