@@ -84,7 +84,7 @@ score.jt <- function(formula, data, ploidy, ...)
     )), fit='jt')
 }
 
-score.chisq.2x2 <- function(formula, data, ploidy)
+score.chisq.2x2 <- function(formula, data, ploidy=NA)
 {
     pt <- data[,.lhs.formula(formula)]
     gt <- factor(data$genotype,levels=0:2)
@@ -227,14 +227,23 @@ function(formula, data, ploidy, quick=FALSE,
 #-----------------------------------------------------------------------
 
 score.glm <-
-function(formula, data, ploidy, drop='genotype',
+function(formula, data, ploidy, drop='genotype', test=c('LR','Wald','Rao'),
          mode=c('additive','recessive','dominant','general'))
 {
     data$genotype <- .recode.gt(data$genotype, match.arg(mode))
     m <- glm(formula, binomial, data)
-    nf <- .null.model(formula, term=drop)
-    pvalue <- anova(update(m,nf), m, test='Chisq')[2,5]
     x <- coef(summary(m))
+    test <- match.arg(test)
+    if (test == 'LR') {
+        nf <- .null.model(formula, term=drop)
+        pvalue <- anova(update(m,nf), m, test='Chisq')[2,5]
+    } else if (test == 'Rao') {
+        require(statmod)
+        nf <- .null.model(formula, term=drop)
+        pvalue <- 2*pnorm(-abs(glm.scoretest(update(m,nf), data[,drop])))
+    } else {
+        pvalue <- x[drop,4]
+    }
     x <- if (drop %in% row.names(x)) unname(x[drop,]) else c(NA,NA)
     keep.attr(data.frame(
         pvalue, effect=x[1], stderr=x[2]

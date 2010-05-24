@@ -24,6 +24,7 @@
 }
 \usage{
 score.glm(formula, data, ploidy, drop='genotype',
+          test=c('LR','Wald','Rao'),
           mode=c('additive','recessive','dominant','general'))
 }
 \arguments{
@@ -31,13 +32,18 @@ score.glm(formula, data, ploidy, drop='genotype',
   \item{data}{a data frame containing the variables in the model.}
   \item{ploidy}{see \code{\link{fetch.gt.data}}.  Ignored.}
   \item{drop}{the model term to test for association.}
+  \item{test}{the scoring test.  See details.}
   \item{mode}{genetic mode of action to be tested.}
 }
 \details{
   The model formula may include covariates and should contain a single
-  genotype term without interactions.  Significance is assessed by
-  ANOVA comparing the full model with a null model constructed by
-  removing this term. 
+  genotype term without interactions.  For \code{test='LR'} (the default),
+  significance is assessed by ANOVA comparing the full model with a null
+  model constructed by removing this term.  Other options are
+  \code{test='Wald'} (a Wald test on the coefficient of the genotype
+  term in the regression model), and \code{test='Rao'} (the Rao score
+  test, which is equivalent to the Cochran-Armitage trend test if there
+  are no covariates).
 
   At sex linked loci, haploid males are treated the same as the
   corresponding diploid female homozygotes.
