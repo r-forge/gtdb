@@ -1,5 +1,6 @@
 %
 % Copyright (C) 2009, Perlegen Sciences, Inc.
+% Copyright (C) 2010, 23andMe, Inc.
 % 
 % Written by David A. Hinds <dhinds@sonic.net>
 % 
@@ -25,16 +26,16 @@
 }
 \usage{
 gplot(formula, data, aggr.fn=max, rescale=FALSE, binsz=1e6,
-      subset=TRUE, col.regions=rev(heat.colors(100)[10:100]),
+      subset=TRUE, col.regions=rev(heat.colors(100)[10:90]),
       scales=list(x=list(at=seq(0,250,20), draw=TRUE)),
       shrink=list(x=1,y=0.75), colorkey=list(height=0.25),
-      xlab='Position, Mb', ylab='Chromosome', ...)
+      xlab='Position, Mb', ylab='Chromosome', zlim, ...)
 }
 \arguments{
   \item{formula}{a one-sided formula (i.e. \code{~ x}) describing the
                  values to be plotted.}
   \item{data}{a data frame containing values required to evaluate
-              \code{formula}, as well as \code{chromosome} and 
+              \code{formula}, as well as \code{scaffold} and 
               \code{position} columns.}
   \item{aggr.fn}{an aggregating function to apply to data within each bin.}
   \item{rescale}{logical: indicates if results should be scaled based
@@ -44,6 +45,9 @@ gplot(formula, data, aggr.fn=max, rescale=FALSE, binsz=1e6,
                 \code{data} to be included in the plot.}
   \item{col.regions, scales, shrink, colorkey, xlab, ylab}{see
     \code{\link[lattice:levelplot]{levelplot}}.}
+  \item{zlim}{if present, gives the lower and upper limits for the
+    plotted values; values outside this range are clipped to the
+    appropriate limit value.}
   \item{\dots}{additional arguments passed to
     \code{\link[lattice:levelplot]{levelplot}}.}
 }
