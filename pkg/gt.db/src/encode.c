@@ -61,6 +61,11 @@ SEXP do_encode_gt(SEXP sa, SEXP sg)
 	for (i = 0; i < LENGTH(sa); i++) {
 		a = CHAR(STRING_ELT(sa,i));
 		a1 = a[0]; a2 = a[2];
+		if (a1 == '-') {
+			/* codes for insertion/deletion polymorphisms */
+			a1 = 'D';
+			a2 = 'I';
+		}
 		g = CHAR(STRING_ELT(sg,i));
 		for (j = 0; j < len && *g; j++) {
 			buf[j] = '?';

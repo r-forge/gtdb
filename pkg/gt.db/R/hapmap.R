@@ -24,9 +24,10 @@
 
 .fixup.hapmap.alleles <- function(alleles, geno)
 {
-    # fill in non-SNP allele lists based on the actual data
-    bad <- grep('^[ACGT]/[ACGT]$', alleles, invert=TRUE)
-    if (!length(bad)) return(alleles)
+    # fill in non-bi-allelic allele lists based on the actual data
+    bad <- (!grepl('^[ACGT]/[ACGT]$', alleles) &
+            !grepl('^-/[ACGT]+$', alleles))
+    if (!any(bad)) return(alleles)
     gt <- c('A','C','G','T')
     tbl <- (ch.table(geno[bad], chars=gt) > 0)
     a12 <- apply(tbl, 1, function(x) c(gt[x],'?','?')[1:2])
