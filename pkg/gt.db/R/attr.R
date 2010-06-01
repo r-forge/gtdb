@@ -72,7 +72,8 @@ rm.attr <- function(target, parent.name, attr.name)
         } else if (dt == 'boolean') {
             data[,n] <- as.logical(as.numeric(data[,n]))
         } else if (dt == 'factor') {
-            lv <- eval(parse(text=paste('c(', info[n,'levels'], ')')))
+            lv <- sub("^'(.*)'$", "\\1", info[n,"levels"])
+            lv <- strsplit(lv, "','")[[1]]
             data[,n] <- factor(data[,n], levels=lv)
         }
     }

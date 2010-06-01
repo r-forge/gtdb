@@ -148,6 +148,7 @@ store.sample.data <- function(dataset.name, data)
     insert.column <- function(attr.id, col)
     {
         w <- !is.na(col)
+        if (!any(w)) return(0)
         sql.exec(gt.db::.gt.db, sql, samp.id[w], attr.id, col[w])
     }
     mapply(insert.column, attr.id, data)

@@ -103,6 +103,7 @@ store.subject.data <- function(project.name, data)
     insert.column <- function(attr.id, col)
     {
         w <- !is.na(col)
+        if (!any(w)) return(0)
         sql.exec(gt.db::.gt.db, sql, subj.id[w], attr.id, col[w])
     }
     mapply(insert.column, attr.id, data)

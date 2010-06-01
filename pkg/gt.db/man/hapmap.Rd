@@ -22,8 +22,9 @@
 \title{Subject Data from the International HapMap Project}
 \description{
   \code{hapmap.subjects} describes sample plate and panel membership,
-  and parent/child relationships, for the 1301 individuals genotyped in
-  the Phase II and Phase III HapMap Projects.
+  and parent/child relationships, for 1506 individuals genotyped in the
+  Phase II and Phase III HapMap Projects.  The table includes the union
+  of samples reported in phase 3 releases 2 and 3.
 }
 \usage{data(hapmap)}
 \source{The International HapMap Project}
