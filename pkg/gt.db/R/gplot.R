@@ -71,7 +71,9 @@ manhattan.plot <-
         }
     }
     w <- match(paste('chr',xticks,sep=''), names(len))
+    xlim <- range(pos,na.rm=TRUE) + 50e6*c(-1,1)
+    panel.fn <- function(...) { xyplot(...) ; panel.refline(h=threshold) }
     xyplot(val~pos, ..., cex=cex, groups=grp, par.settings=set,
            scales=list(x=list(at=mid[w],tck=0,labels=xticks)),
-           xlab=xlab, ylab=ylab)
+           panel=panel.fn, xlab=xlab, ylab=ylab, xlim=xlim)
 }

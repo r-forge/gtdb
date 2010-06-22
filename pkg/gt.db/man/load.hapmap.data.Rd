@@ -42,7 +42,7 @@ load.hapmap.data(files, project.name='HapMap', map=TRUE, verbose=TRUE)
   files are supported.
 
   It has been tested against Phase II unphased r22 and r24, Phase II
-  phased r22, and Phase III unphased r2.
+  phased r22, and Phase III unphased r2 and r3.
 
   In principle, it should be possible to define a \dQuote{Phase II}
   platform once, and have multiple HapMap datasets refer to that

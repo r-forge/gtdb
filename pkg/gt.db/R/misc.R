@@ -119,10 +119,9 @@ gt.demo.check <- function()
             use.gt.db(db)
         } else if (!interactive()) {
             require(RSQLite)
-            warning("creating temporary demo database...")
-            fn <- tempfile()
-            db <- dbConnect(dbDriver('SQLite'), fn, loadable.extensions=TRUE)
-            unlink(fn)
+            warning("creating in-memory demo database...")
+            db <- dbConnect(dbDriver('SQLite'), ':memory:',
+                            loadable.extensions=TRUE)
             use.gt.db(db)
             init.gt.db(db.mode='hex')
             demo('setup.gt.demo')

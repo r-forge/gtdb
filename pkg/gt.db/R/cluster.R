@@ -19,10 +19,19 @@
 #
 
 panel.cluster <-
-function(x, y, group.number=1, bounds=c(), min.points=4, ...)
+function(x, y, group.number=1, mark, pch, alpha,
+         subscripts, bounds=c(), min.points=4, ...)
 {
     require(cluster)
-    panel.xyplot(x, y, ...)
+    if (any(mark)) {
+        m <- mark[subscripts]
+        panel.xyplot(x[!m], y[!m], subscripts=subscripts[!m],
+                     pch=pch, alpha=alpha, ...)
+        panel.xyplot(x[m], y[m], subscripts=subscripts[m],
+                     pch=8, alpha=1, ...)
+    } else
+        panel.xyplot(x, y, subscripts=subscripts,
+                     pch=pch, alpha=alpha, ...)
     if (!length(bounds))
         return()
     grp <- function(x,n) lapply(x, function(y) y[(n-1)%%length(y)+1])
@@ -41,20 +50,22 @@ function(x, y, group.number=1, bounds=c(), min.points=4, ...)
 
 .gt.settings <- list(
     superpose.symbol=list(
-        pch=c(1,1,1,3),
-        col=c('#377db8','#e31a1c','#2daf4a','black')
+        pch=c(1,1,1,3,3),
+        col=c('#377db8','#e31a1c','#2daf4a','black','orange')
     ),
     superpose.line=list(
-        lty=c(1,1,1,0),
-        col=c('#377db8','#e31a1c','#2daf4a','black')
+        lty=c(1,1,1,0,0),
+        col=c('#377db8','#e31a1c','#2daf4a','black','orange')
     )
 )
 
 gt.cluster.plot <-
-function(data, rescale=TRUE, bounds=c(0.5,0.95), min.points=4,
-         between=list(x=0.5,y=0.5), scales=list(alternating=0),
-         xlab=NULL, ylab=NULL, par.settings=.gt.settings, ...)
+function(data, by=assay.name, rescale=TRUE, bounds=c(0.5,0.95),
+         mark=FALSE, min.points=4, between=list(x=0.5,y=0.5),
+         scales=list(alternating=0), xlab=NULL, ylab=NULL,
+         par.settings=.gt.settings, ...)
 {
+    mark <- eval(substitute(mark), data, parent.frame())
     if ('signal.a' %in% names(data)) {
         x <- data$signal.a
         y <- data$signal.b
@@ -89,7 +100,7 @@ function(data, rescale=TRUE, bounds=c(0.5,0.95), min.points=4,
         }
     }
 
-    n <- factor(data$assay.name)
+    n <- factor(eval(substitute(by), data, parent.frame()))
     if (rescale) {
         if (equal) {
             q <- tapply(c(x,y), rep(n,2), range, na.rm=TRUE)
@@ -117,7 +128,7 @@ function(data, rescale=TRUE, bounds=c(0.5,0.95), min.points=4,
         gt[is.na(gt)] <- nn
     }
     p <- xyplot(y~x|n, groups=gt, bounds=bounds, min.points=min.points,
-                scales=scales, prepanel=prepanel, aspect=1,
+                scales=scales, prepanel=prepanel, aspect=1, mark=mark,
                 panel=panel.superpose, panel.groups=panel.cluster,
                 xlab=xlab, ylab=ylab, between=between,
                 par.settings=par.settings, ...)

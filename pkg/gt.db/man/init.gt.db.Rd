@@ -54,11 +54,8 @@ init.gt.db(db.mode='raw')
   \code{\link{demo}(setup.gt.demo)}.
 }
 \examples{\dontrun{
-# create new SQLite database in a temporary file
-fn <- tempfile()
-dbx <- dbConnect(dbDriver('SQLite'), fn)
-# unlink it so it will go away at the end of the session
-unlink(fn)
+# create temporary in-memory SQLite database
+dbx <- dbConnect(dbDriver('SQLite'), ':memory:')
 use.gt.db(dbx)
 init.gt.db(db.mode='hex')
 demo('setup.gt.demo')

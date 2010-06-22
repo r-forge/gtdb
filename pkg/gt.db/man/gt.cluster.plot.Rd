@@ -25,15 +25,18 @@
   predicted ellipsoid boundary regions.
 }
 \usage{
-gt.cluster.plot(data, rescale=TRUE, bounds=c(0.5,0.95), min.points=4,
-                between=list(x=0.5,y=0.5), scales=list(alternating=0),
-                xlab=NULL, ylab=NULL, par.settings=.gt.settings, ...)
+gt.cluster.plot(data, by=assay.name, rescale=TRUE, bounds=c(0.5,0.95),
+                min.points=4, between=list(x=0.5,y=0.5),
+                scales=list(alternating=0), xlab=NULL, ylab=NULL,
+                par.settings=.gt.settings, ...)
 \method{xyplot}{gt.data}(x, ...)
 }
 \arguments{
   \item{data}{an unpacked data frame of genotype information from
     \code{reshape.gt.data}.}
   \item{x}{a data frame of genotypes from \code{fetch.gt.data}.}
+  \item{by}{an expression used to define and label panels within the
+    plot, evaluated in \code{data}.}
   \item{rescale}{logical: indicates if each data in each panel should
     be scaled to fill the frame.}
   \item{bounds}{contours at which to draw ellipsoid boundaries.}
