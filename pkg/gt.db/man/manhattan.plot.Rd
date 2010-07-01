@@ -44,7 +44,10 @@ manhattan.plot(y, data, gap=0, threshold=-log10(5e-8), around=0,
     \code{\link[lattice:xyplot]{xyplot}}.}
 }
 \details{
-  Typically, the scores are expected to be \code{-log10(pvalue)}.
+  Typically, the scores are expected to be \code{-log10(pvalue)}.  If
+  the source data spans multiple chromosomes, then chromosome names are
+  shown along the X axis.  If the data is all on a single chromosome,
+  then chromosomal positions are shown.
 }
 \value{
   A plot object of class \code{"trellis"}.

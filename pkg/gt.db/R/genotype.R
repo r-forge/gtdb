@@ -326,7 +326,7 @@ summary.gt.data <- function(object, sample.mask, by.sample=FALSE, ...)
     dg <- ifelse(s=='A', g, x)
     hg <- ifelse(s=='M', g, x)
     if (any(s=='X'))
-        dg[s=='X'] <- mask.str(dg[s=='X'], gm['F'])
+        dg[s=='X'] <- mask.str(g[s=='X'], gm['F'])
     if (any(s %in% c('X','Y'))) {
         if (any(!(un.mask(gm['M']) | un.mask(gm['F']))))
             warning('some samples have unknown gender')

@@ -205,6 +205,8 @@ function(g1, g2, measure, method, epsilon, max.it)
     }
     if (length(s) > 1)
         stop('inconsistent ploidy information')
+    if (measure == 'none')
+        return(rep(NA,max(nrow(g1),nrow(g2))))
     if (s == 'A') {
         m <- ch.table(g1$genotype, g2$genotype, c('a','h','b'))
     } else if (s == 'X') {
@@ -259,6 +261,40 @@ function(g1, g2=g1, outer=TRUE,
     r
 }
 
+.panel.ldplot <-
+    function(x, y, z, at=pretty(z), rug=FALSE, ...,
+             col.regions=regions$col, alpha.regions=regions$alpha)
+{
+    regions <- trellis.par.get("regions")
+    x <- as.numeric(x)
+    y <- as.numeric(y)
+    zcol <- level.colors(z, at, col.regions, colors = TRUE)
+
+    ux <- sort(unique(x[!is.na(x)]))
+    bx <- if (length(ux) > 1)
+        c(3 * ux[1] - ux[2], ux[-length(ux)] + ux[-1], 3 *
+          ux[length(ux)] - ux[length(ux) - 1])/2
+    else ux + c(-1,1)
+    lx <- 0.5 * diff(bx)
+    cx <- (bx[-1] + bx[-length(bx)])/2
+
+    if (is.list(rug))
+        do.call('panel.rug', c(list(x=ux),rug))
+    else if (rug)
+        panel.rug(ux)
+
+    idx <- match(x, ux)
+    idy <- match(y, ux)
+    x0 <- (cx[idx]+cx[idy])/2 - (lx[idx]+lx[idy])/2
+    xm <- rbind(x0, x0+lx[idy], x0+lx[idx]+lx[idy], x0+lx[idx])
+    y0 <- (max(cy) - (cx[idx]-cx[idy]) + (lx[idx]-lx[idy]))/2
+    ym <- rbind(y0, y0+lx[idy], y0+lx[idy]-lx[idx], y0-lx[idx])*2
+    gp <- gpar(fill=zcol, lwd=1e-5, col='transparent', alpha=alpha.regions)
+    grid.polygon(x=as.vector(xm), y=as.vector(ym),
+                 id.lengths=rep(4,length(x0)),
+                 default.units = "native", gp = gp)
+}
+
 ld.plot <-
 function(gt.data, col=gray(seq(1,0,-0.01)), measure='rsqr',
          rotate=FALSE, equal=TRUE, colorkey=list(height=0.5),
@@ -272,27 +308,30 @@ function(gt.data, col=gray(seq(1,0,-0.01)), measure='rsqr',
     }
     if (missing(scales)) {
         scales <- if (equal) list(alternating=0) else list()
-        if (rotate) scales <- list(draw=FALSE)
-    }
-    if (equal) {
-        p <- levelplot(ld, aspect=1, col.regions=col, colorkey=colorkey,
-                       xlab=NULL, ylab=NULL, scales=scales, ...)
-    } else {
-        p <- as.character(gt.data$position)
-        dimnames(ld) <- list(p,p)
-        xd <- as.data.frame.table(ld)
-        xd[,1] <- as.numeric(as.character(xd[,1]))
-        xd[,2] <- as.numeric(as.character(xd[,2]))
-        p <- levelplot(Freq~Var1*Var2, xd, aspect=1,
-                       col.regions=col, colorkey=colorkey,
-                       xlab=NULL, ylab=NULL, scales=scales, ...)
+        if (rotate) scales <- list(y=list(draw=FALSE))
     }
     if (rotate) {
-        grid.newpage()
-        pushViewport(viewport(h=0.707,w=0.707,angle=-45))
-        suppressWarnings(print(p,newpage=FALSE))
-        popViewport()
-    } else { p }
+        panel.fn <- .panel.ldplot
+        aspect <- 0.5
+    } else {
+        panel.fn <- panel.levelplot
+        aspect <- 1.0
+    }
+    if (equal) {
+        levelplot(ld, aspect=aspect,
+                  col.regions=col, colorkey=colorkey,
+                  xlab=NULL, ylab=NULL, scales=scales,
+                  panel=panel.fn, ...)
+    } else {
+        dimnames(ld) <- list(gt.data$position)[c(1,1)]
+        xd <- as.data.frame.table(ld, stringsAsFactors=FALSE)
+        xd[,1] <- as.numeric(xd[,1])
+        xd[,2] <- as.numeric(xd[,2])
+        levelplot(Freq~Var1*Var2, xd, aspect=aspect,
+                  col.regions=col, colorkey=colorkey,
+                  xlab=NULL, ylab=NULL, scales=scales,
+                  panel.fn=panel.fn, ...)
+    }
 }
 
 ld.prune <-

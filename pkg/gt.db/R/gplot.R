@@ -70,10 +70,17 @@ manhattan.plot <-
             grp[abs(pos - hit) < around] <- 2
         }
     }
-    w <- match(paste('chr',xticks,sep=''), names(len))
-    xlim <- range(pos,na.rm=TRUE) + 50e6*c(-1,1)
+    xlim <- range(pos,na.rm=TRUE)
+    xlim <- xlim + (xlim[2]-xlim[1]) * c(-0.02,0.02)
     panel.fn <- function(...) { xyplot(...) ; panel.refline(h=threshold) }
-    xyplot(val~pos, ..., cex=cex, groups=grp, par.settings=set,
-           scales=list(x=list(at=mid[w],tck=0,labels=xticks)),
-           panel=panel.fn, xlab=xlab, ylab=ylab, xlim=xlim)
+    if (length(len) == 1) {
+        set <- list(superpose.symbol=list(col=col[-2]))
+        xyplot(val~pos, ..., cex=cex, groups=grp, par.settings=set,
+               panel=panel.fn, xlab=xlab, ylab=ylab, xlim=xlim)
+    } else {
+        w <- match(paste('chr',xticks,sep=''), names(len))
+        xyplot(val~pos, ..., cex=cex, groups=grp, par.settings=set,
+               scales=list(x=list(at=mid[w],tck=0,labels=xticks)),
+               panel=panel.fn, xlab=xlab, ylab=ylab, xlim=xlim)
+    }
 }

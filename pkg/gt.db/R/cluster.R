@@ -19,19 +19,10 @@
 #
 
 panel.cluster <-
-function(x, y, group.number=1, mark, pch, alpha,
-         subscripts, bounds=c(), min.points=4, ...)
+function(x, y, group.number=1, bounds=c(), min.points=4, ...)
 {
     require(cluster)
-    if (any(mark)) {
-        m <- mark[subscripts]
-        panel.xyplot(x[!m], y[!m], subscripts=subscripts[!m],
-                     pch=pch, alpha=alpha, ...)
-        panel.xyplot(x[m], y[m], subscripts=subscripts[m],
-                     pch=8, alpha=1, ...)
-    } else
-        panel.xyplot(x, y, subscripts=subscripts,
-                     pch=pch, alpha=alpha, ...)
+    panel.xyplot(x, y, ...)
     if (!length(bounds))
         return()
     grp <- function(x,n) lapply(x, function(y) y[(n-1)%%length(y)+1])
@@ -61,11 +52,10 @@ function(x, y, group.number=1, mark, pch, alpha,
 
 gt.cluster.plot <-
 function(data, by=assay.name, rescale=TRUE, bounds=c(0.5,0.95),
-         mark=FALSE, min.points=4, between=list(x=0.5,y=0.5),
+         min.points=4, between=list(x=0.5,y=0.5),
          scales=list(alternating=0), xlab=NULL, ylab=NULL,
          par.settings=.gt.settings, ...)
 {
-    mark <- eval(substitute(mark), data, parent.frame())
     if ('signal.a' %in% names(data)) {
         x <- data$signal.a
         y <- data$signal.b
@@ -128,7 +118,7 @@ function(data, by=assay.name, rescale=TRUE, bounds=c(0.5,0.95),
         gt[is.na(gt)] <- nn
     }
     p <- xyplot(y~x|n, groups=gt, bounds=bounds, min.points=min.points,
-                scales=scales, prepanel=prepanel, aspect=1, mark=mark,
+                scales=scales, prepanel=prepanel, aspect=1,
                 panel=panel.superpose, panel.groups=panel.cluster,
                 xlab=xlab, ylab=ylab, between=between,
                 par.settings=par.settings, ...)
