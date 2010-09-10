@@ -138,7 +138,7 @@ load.affy.mapping <- function(anno, progress=TRUE)
     d$forced.call <- recode.gt(d$forced.call)
     qscore <- round(-10*log10(d$confidence))
     qscore <- ifelse(is.finite(qscore), qscore, 0)
-    raw.data <- rawToHex(matrix(.pack.chpdata(d), ncol=nrow(d)))
+    raw.data <- ramToHex(matrix(.pack.chpdata(d), ncol=nrow(d)))
     data.frame(genotype=recode.gt(d$call),
                qscore=as.integer(qscore),
                raw.data=raw.data,

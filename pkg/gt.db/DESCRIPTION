@@ -1,6 +1,6 @@
 Package: gt.db
-Version: 0.6-1
-Date: 2010-02-21
+Version: 0.7-1
+Date: 2010-08-12
 Title: GT.DB: Genotype Data Management and Analysis
 Author: David Hinds
 Maintainer: David Hinds <dhinds@sonic.net>
@@ -9,3 +9,4 @@ Description: Framework for storing and manipulating genotype data,
 License: GPL
 Depends: R (>= 2.7.0), lattice, grid, methods, DBI
 Suggests: nlme, cluster, mda, RMySQL, RSQLite
+Packaged: 2010-08-12 20:47:05 UTC; dhinds

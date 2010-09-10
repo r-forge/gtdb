@@ -24,12 +24,15 @@
   the same polymorphisms, based either on position or dbSNP rsIDs.
 }
 \usage{
-match.gt.data(gt.data.1, gt.data.2, by=c('position','dbsnp.rsid'))
+match.gt.data(gt.data.1, gt.data.2, by=c('position','dbsnp.rsid'),
+              all=FALSE)
 }
 \arguments{
   \item{gt.data.1, gt.data.2}{data frames with assay information to be
     compared.}
   \item{by}{the method to use to identify equivalent assays.}
+  \item{all}{logical: indicates whether to report assays that could not
+    be oriented and/or had inconsistent alleles.}
 }
 \details{
   This first identifies assays with corresponding positions (or dbSNP

@@ -20,37 +20,47 @@
 \name{hexToRaw}
 \alias{hexToRaw}
 \alias{rawToHex}
+\alias{hexToRam}
+\alias{ramToHex}
 \title{Convert between Raw Vectors and Hex Strings}
 \description{
   Convert between raw vectors and hex strings.
 }
 \usage{
-hexToRaw(hex, drop=TRUE)
+hexToRaw(hex)
 rawToHex(raw)
+hexToRam(hex)
+ramToHex(raw)
 }
 \arguments{
-  \item{hex}{a character vector composed of strings of hex digits, all
-    the same length.}
-  \item{drop}{logical: indicates whether to convert a single-column
-    result to a vector.}
+  \item{hex}{a character vector composed of strings of hex digit pairs,
+    all the same length.}
   \item{raw}{a raw vector or matrix.}
 }
+\details{
+  \code{hexToRaw} and \code{RawToHex} convert between a single character
+  string and a raw vector.  \code{hexToRam} and \code{ramToHex} convert
+  between a character vector and a raw matrix.  Columns of the raw
+  matrix become individual character strings, and vice versa.
+}
 \value{
-  For \code{hexToRaw}, a raw matrix with one column per string in
-  \code{hex}, constructed by converting each consecutive pair of hex
-  digits to one byte.
-
+  For \code{hexToRaw}, a raw vector with one byte per pair of hex digits 
+  in the input string.  For \code{hexToRam}, a raw matrix with one
+  column per string in \code{hex}, constructed by converting each
+  consecutive pair of hex digits to one byte.
+  
   For \code{rawToHex}, a character string formed by converting each byte
-  of the input vector to its two-digit hex representation, or a vector
-  formed by converting each column of an input matrix to its hex
-  representation.
+  of the input vector to its two-digit hex representation.  For
+  \code{ramToHex}, a vector formed by converting each column of an input
+  matrix to its hex representation.
 }
 \seealso{
-  \code{\link{charToRaw}}, \code{\link{rawToChar}}.
+  \code{\link{charToRaw}}, \code{\link{rawToChar}},
+  \code{\link{charToRam}}, \code{\link{ramToChar}}.
 }
 \examples{
 hexToRaw('1a3b1a3b')
 rawToHex(as.raw(seq(0,100,10)))
-hexToRaw(c('1234','5678','9abc'))
+hexToRam(c('1234','5678','9abc'))
 }
 \keyword{classes}

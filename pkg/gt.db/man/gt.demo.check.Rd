@@ -21,16 +21,21 @@
 \title{Check for Presence of GT.DB Demo Datasets}
 \description{
   This is used in many of the GT.DB examples to check for the presence
-  of the demo datasets.
+  of the demo datasets, and optionally to create a temporary demo
+  database.
 }
 \usage{
 gt.demo.check()
 }
 \details{
-  If the demo datasets are unavailable, then the example code is
-  terminated with an error message.  If invoked non-interactively (say,
-  from \code{R CMD CHECK}), then a temporary SQLite database is created
-  for the demo datasets.
+  This first checks whether a GT.DB database has been selected by
+  \code{\link{use.gt.db}}, and if so, whether the demo datasets have
+  been loaded.  If so, then it exits normally.  If a database is active
+  but the demo datasets are unavailable, then an error is generated.  If
+  no database is active, then if invoked interactively, this prompts the
+  user to optionally create a temporary in-memory SQLite database for
+  the demo datasets.  If invoked non-interactively (say, from \code{R
+  CMD CHECK}), then a temporary SQLite database is always created.
 }
 \seealso{
   \code{\link{init.gt.db}}, \code{\link{demo}(setup.gt.demo)}.

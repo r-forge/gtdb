@@ -2,7 +2,7 @@
 # Copyright (C) 2009, Perlegen Sciences, Inc.
 # Copyright (C) 2010, 23andMe, Inc.
 #
-# Written by David A. Hinds <dhinds@sonic.net>
+# Written by David A. Hinds <dhinds@23andMe.com>
 #
 # This is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
@@ -27,6 +27,18 @@
     a <- sub('([0-9]+)$', '000000000\\1', n)
     a <- sub('0+([0-9]{9})$', '\\1', a)
     factor(x, levels=n[order(a,decreasing=decreasing)])
+}
+
+sample.names <- function(x) attr(x,'sample.names')
+'sample.names<-' <- function(x, value)
+{
+    structure(x, sample.names=as.character(value))
+}
+
+gender <- function(x) attr(x,'gender')
+'gender<-' <- function(x, value)
+{
+    structure(x, gender=.fixup.gender(value))
 }
 
 fetch.gt.data <-
@@ -66,26 +78,28 @@ function(dataset.name, mapping.name, assay.name, dbsnp.rsid,
       where d.assay_id=a.assay_id
         and a.assay_id=p.assay_id
         and dataset_id=:1
-        and mapping_id=:2')
+        and platform_id=:2
+        and mapping_id=:3')
 
-    dset.id <- lookup.id('dataset', dataset.name)
-    ds <- ls.dataset(,dataset.name)
+    ds <- ls.dataset(,dataset.name,show.ids=TRUE)
+    dset.id <- ds$dataset.id
+    plat.id <- ds$platform.id
     map.id <- lookup.mapping.id(ds$platform.name, mapping.name)
-    dat <- .sql.prep.data(dset.id, map.id)
+    dat <- .sql.prep.data(dset.id, plat.id, map.id)
     if (!missing(assay.name)) {
-        sql <- paste(sql, 'and a.name=:3')
-        dat <- .sql.prep.data(dset.id, map.id, assay.name)
+        sql <- paste(sql, 'and a.name=:4')
+        dat <- .sql.prep.data(dset.id, plat.id, map.id, assay.name)
     } else if (!missing(dbsnp.rsid)) {
-        sql <- paste(sql, 'and dbsnp_rsid=:3')
-        dat <- .sql.prep.data(dset.id, map.id, dbsnp.rsid)
+        sql <- paste(sql, 'and dbsnp_rsid=:4')
+        dat <- .sql.prep.data(dset.id, plat.id, map.id, dbsnp.rsid)
     } else if (!missing(part)) {
         by <- match.arg(by)
         if (by=='position') {
-            sql <- paste(sql, 'and :mod:(:floor:(position/:3)%%:4)=:5-1')
+            sql <- paste(sql, 'and :mod:(:floor:(position/:4)%%:5)=:6-1')
         } else {
-            sql <- paste(sql, 'and :mod:(:floor:(assay_data_id/:3)%%:4)=:5-1')
+            sql <- paste(sql, 'and :mod:(:floor:(a.assay_id/:4)%%:5)=:6-1')
         }
-        dat <- .sql.prep.data(dset.id, map.id, binsz, parts, part)
+        dat <- .sql.prep.data(dset.id, plat.id, map.id, binsz, parts, part)
     }
     if (!missing(where)) sql <- paste(sql, 'and', where)
 
@@ -111,7 +125,6 @@ function(dataset.name, mapping.name, assay.name, dbsnp.rsid,
         any(nchar(d$genotype) != nrow(s))) {
         stop('inconsistent sample layout information!');
     }
-    g <- c(F=as.mask(s$gender=='F'), M=as.mask(s$gender=='M'))
 
     d <- .filter.ids(data.frame(d,row.names=d$assay.name),
                      show.ids, 'assay.data.id')
@@ -120,7 +133,8 @@ function(dataset.name, mapping.name, assay.name, dbsnp.rsid,
               raw.layout=ds$raw.layout,
               platform.name=ds$platform.name,
               mapping.name=names(map.id),
-              gender=g, sample.name=s$sample.name)
+              gender=.fixup.gender(s$gender),
+              sample.names=s$sample.name)
 }
 
 #---------------------------------------------------------------------
@@ -181,17 +195,22 @@ function(v, convert=c('score.b','score.a','char','none'),
 #---------------------------------------------------------------------
 
 unpack.gt.matrix <-
-function(gt.data, names=gt.data$assay.name, ...)
+function(gt.data, names=gt.data$assay.name, ..., dosage=FALSE)
 {
     if ((nrow(gt.data)>1) && (length(names)==1)) {
         names <- paste(names,1:nrow(gt.data),sep='.')
     }
-    a <- strsplit(gt.data$alleles, split='/', fixed=TRUE)
-    fn <- function(x) gt.split(gt.data$genotype[x], ..., alleles=a[[x]])
-    g <- lapply(1:nrow(gt.data), fn)
+    if (dosage) {
+        fn <- function(x) unpack.raw.data(hexToRaw(x),'dosage')$dosage
+        g <- lapply(gt.data$raw.data)
+    } else {
+        a <- strsplit(gt.data$alleles, split='/', fixed=TRUE)
+        g <- mapply(gt.split, gt.data$genotype, ...,
+                    alleles=a, SIMPLIFY=FALSE)
+    }
     names(g) <- names
     if (is.numeric(g[[1]])) g <- do.call('cbind', g)
-    g <- as.data.frame(g, row.names=attr(gt.data,'sample.name'))
+    g <- as.data.frame(g, row.names=sample.names(gt.data))
     keep.attr(g, ploidy=structure(gt.data$ploidy,names=names))
 }
 
@@ -204,7 +223,7 @@ reshape.gt.data <- function(gt.data, ...)
     }
 
     d <- data.frame(assay.name=gt.data$assay.name,
-                    sample.name=attr(gt.data,'sample.name'))
+                    sample.name=sample.names(gt.data))
     row.names(d) <- paste(d$assay.name,d$sample.name,sep='.')
     if (!is.null(gt.data$genotype)) {
         a <- strsplit(gt.data$alleles, split='/', fixed=TRUE)[[1]]
@@ -214,7 +233,7 @@ reshape.gt.data <- function(gt.data, ...)
     tx.mode <- .gt.db.options('tx.mode')
     cvt.fn <- function(x) stop('unknown conversion!')
     if (tx.mode == 'hex')
-        cvt.fn <- hexToRaw
+        cvt.fn <- hexToRam
 
     if (!is.null(gt.data$qscore)) {
         d$qscore <- as.integer(cvt.fn(gt.data$qscore))
@@ -246,15 +265,29 @@ mask.gt.data <- function(gt.data, sample.mask, repack=FALSE)
     if (repack) {
         gt.data$genotype <-
             mask.str(gt.data$genotype, sample.mask, '')
-        g <- mask.str(attr(gt.data,'gender'), sample.mask, '')
-        attr(gt.data,'gender') <- c(F=g[1], M=g[2])
         if (!is.logical(sample.mask))
             sample.mask <- un.mask(sample.mask)
-        attr(gt.data,'sample.name') <-
-            attr(gt.data,'sample.name')[sample.mask]
+        gender(gt.data) <- gender(gt.data)[sample.mask]
+        sample.names(gt.data) <-
+            sample.names(gt.data)[sample.mask]
     } else {
         gt.data$genotype <- mask.str(gt.data$genotype, sample.mask)
     }
+    gt.data
+}
+
+index.gt.data <- function(gt.data, pos)
+{
+    if (is.character(pos)) {
+        pos <- match(pos, sample.names(gt.data))
+    }
+    gt.data$qscore <- NULL
+    gt.data$raw.data <- NULL
+    gt.data$genotype <- index.str(gt.data$genotype, pos)
+    if (!is.null(gender(gt.data))) {
+        gender(gt.data) <- gender(gt.data)[pos]
+    }
+    sample.names(gt.data) <- sample.names(gt.data)[pos]
     gt.data
 }
 
@@ -297,7 +330,7 @@ function(gt.dataset, part.fn, aggr.fn, ..., GT.DATA='gt.data')
 
 .empty.gt <- function(gt.data)
 {
-    nr <- nchar(attr(gt.data,'gender')['M'], 'bytes')
+    nr <- length(gender(gt.data))
     if (length(nr)!=1) nr <- max(c(1,nchar(gt.data$genotype)))
     paste(rep('x',nr), collapse='')
 }
@@ -322,15 +355,15 @@ summary.gt.data <- function(object, sample.mask, by.sample=FALSE, ...)
     x <- .empty.gt(object)
 
     # construct diploid, haploid genotype subsets
-    gm <- attr(object,'gender')
+    gm <- gender(object)
     dg <- ifelse(s=='A', g, x)
     hg <- ifelse(s=='M', g, x)
     if (any(s=='X'))
-        dg[s=='X'] <- mask.str(g[s=='X'], gm['F'])
+        dg[s=='X'] <- mask.str(g[s=='X'], gm=='F')
     if (any(s %in% c('X','Y'))) {
-        if (any(!(un.mask(gm['M']) | un.mask(gm['F']))))
+        if (any(is.na(gm)))
             warning('some samples have unknown gender')
-        hg[s %in% c('X','Y')] <- mask.str(g[s %in% c('X','Y')], gm['M'])
+        hg[s %in% c('X','Y')] <- mask.str(g[s %in% c('X','Y')], gm=='M')
     }
 
     count <- if (by.sample) count.by.col else nsubstr
@@ -345,8 +378,8 @@ summary.gt.data <- function(object, sample.mask, by.sample=FALSE, ...)
     if (by.sample) {
         d <- data.frame(NN, AA, AB, BB, A_, B_, gt.rate,
                         hz=AB/(AA+AB+BB))
-        if (!is.null(attr(object,'sample.name')))
-            rownames(d) <- attr(object,'sample.name')
+        if (!is.null(sample.names(object)))
+            rownames(d) <- sample.names(object)
         d
     } else {
         af <- (2*AA+AB+A_)/(2*(AA+AB+BB)+A_+B_)
@@ -372,24 +405,21 @@ function(object, sample.mask=TRUE, by.sample=FALSE, ...)
 }
 
 match.gt.data <-
-function(gt.data.1, gt.data.2, by=c('position','dbsnp.rsid'))
+function(gt.data.1, gt.data.2, by=c('position','dbsnp.rsid'), all=FALSE)
 {
-    by <- match.arg(by)
-    if (by=='position') {
+    if (match.arg(by)=='position') {
         cols <- c('assay.name','scaffold','position','strand','alleles')
-        d1 <- subset(gt.data.1[cols], !is.na(position))
-        d2 <- subset(gt.data.2[cols], !is.na(position))
-        m <- merge(d1, d2, by=c('scaffold','position'))
+        m <- merge(gt.data.1[cols], gt.data.2[cols],
+                   by=c('scaffold','position'), incomparables=NA)
         f <- (m$strand.x != m$strand.y)
     } else {
         cols <- c('assay.name','dbsnp.rsid','dbsnp.orient','alleles')
-        d1 <- subset(gt.data.1[cols], !is.na(dbsnp.rsid))
-        d2 <- subset(gt.data.2[cols], !is.na(dbsnp.rsid))
-        m <- merge(d1, d2, by='dbsnp.rsid')
+        m <- merge(gt.data.1[cols], gt.data.2[cols],
+                   by='dbsnp.rsid', incomparables=NA)
         f <- (m$dbsnp.orient.x != m$dbsnp.orient.y)
     }
     if (any(is.na(f)))
-        warning(sum(if.na(f)), ' assays could not be oriented')
+        warning(sum(is.na(f)), ' assays could not be oriented')
 
     if (any(if.na(f,FALSE))) {
         w <- which(f)
@@ -399,13 +429,14 @@ function(gt.data.1, gt.data.2, by=c('position','dbsnp.rsid'))
     s[m$alleles.x == .by.allele(m$alleles.y, rev)] <- TRUE
     s[m$alleles.x == m$alleles.y] <- FALSE
     if (any(is.na(s)))
-        warning(sum(if.na(s)), ' assays had inconsistent alleles')
+        warning(sum(is.na(s)), ' assays had inconsistent alleles')
 
     d <- data.frame(m$assay.name.x, m$assay.name.y,
-                    is.flipped=f, is.swapped=s)
+                    is.flipped=f, is.swapped=s,
+                    stringsAsFactors=FALSE)
     names(d)[1] <- c(attr(gt.data.1,'dataset.name'),'gt.data.1')[1]
     names(d)[2] <- c(attr(gt.data.2,'dataset.name'),'gt.data.2')[1]
-    subset(d, !is.na(f) & !is.na(s))
+    if (all) d else subset(d, !is.na(f) & !is.na(s))
 }
 
 orient.gt.data <- function(gt.data, flip=FALSE, swap=FALSE)
@@ -424,4 +455,50 @@ orient.gt.data <- function(gt.data, flip=FALSE, swap=FALSE)
             sapply(gt.data$alleles[flip], .by.allele, revcomp)
     }
     gt.data
+}
+
+.corr.3x3 <- function(m)
+{
+    # straight Pearson correlation of allele counts
+    m <- m[,1:3,1:3,drop=FALSE]
+    x <- apply(m,c(1,2),sum)
+    y <- apply(m,c(1,3),sum)
+    n <- apply(m,1,sum)
+    sx <- x[,3]-x[,1]
+    sy <- y[,3]-y[,1]
+    (n*(m[,1,1]+m[,3,3]-m[,3,1]-m[,1,3]) - sx*sy) /
+        sqrt((n*(x[,1]+x[,3]) - sx^2)*(n*(y[,1]+y[,3]) - sy^2))
+}
+
+diff.gt.data <-
+function(gt.data.1, gt.data.2, match.by='position', by.sample=FALSE,
+         type=c('count','freq'))
+{
+    type <- match.arg(type)
+    m <- match.gt.data(gt.data.1, gt.data.2, by=match.by)
+    x <- gt.data.1[match(m[,1],row.names(gt.data.1)),]
+    y <- gt.data.2[match(m[,2],row.names(gt.data.2)),]
+    y <- orient.gt.data(y, m$is.flipped, m$is.swapped)
+
+    s <- intersect(sample.names(gt.data.1), sample.names(gt.data.2))
+    x <- index.gt.data(x, s)
+    y <- index.gt.data(y, s)
+
+    if (by.sample) {
+        tbl <- ch.table(ramToChar(t(charToRam(x$genotype))),
+                        ramToChar(t(charToRam(y$genotype))),
+                        c('a','h','b','n'))
+        d <- data.frame(row.names=s)
+    } else {
+        tbl <- ch.table(x$genotype, y$genotype, c('a','h','b','n'))
+        d <- cbind(m[1:2], freq.1=summary(x)$freq.a,
+                   freq.2=summary(y)$freq.a, r=.corr.3x3(tbl))
+    }
+
+    if (type=='freq')
+        tbl <- tbl/(if (by.sample) nrow(x) else length(s))
+    same <- tbl[,1,1]+tbl[,2,2]+tbl[,3,3]
+    diff <- apply(tbl[,1:3,1:3,drop=FALSE],1,sum) - same
+    undef <- apply(tbl,1,sum) - same - diff
+    cbind(d, undef=undef, same=same, diff=diff)
 }

@@ -25,8 +25,14 @@
 .fixup.hapmap.alleles <- function(alleles, geno)
 {
     # fill in non-bi-allelic allele lists based on the actual data
-    bad <- (!grepl('^[ACGT]/[ACGT]$', alleles) &
-            !grepl('^-/[ACGT]+$', alleles))
+    bad <- !grepl('^[ACGT]/[ACGT]$', alleles)
+    ind <- grepl('^-/[ACGT]+$', alleles)
+    if (any(ind)) {
+        # true indels are not bad
+        tbl <- ch.table(geno[ind], chars=c('D','I'))
+        ind[ind] <- ind[ind] & (rowSums(tbl) > 0)
+        bad <- bad & !ind
+    }
     if (!any(bad)) return(alleles)
     gt <- c('A','C','G','T')
     tbl <- (ch.table(geno[bad], chars=gt) > 0)
@@ -196,16 +202,16 @@ load.hapmap.data <-
     stopifnot(nrow(f) == nchr * npop)
 
     phase <- (if (grepl('phase3',f$rel[1])) 3 else 2)
-    platform <- paste('HapMap', phase, sep='')
     mapping <- sub('phase3\\.','r',f$rel[1])
-    dataset <- paste(platform, mapping, f$ver[1], sep='_')
+    platform <- sprintf('HapMap%s_%s', phase, mapping)
+    dataset <- paste(platform, f$ver[1], sep='_')
     if (npop == 1) dataset <- paste(dataset, f$pop[1], sep='_')
-    desc <- sprintf('HapMap Phase %d', phase)
+    desc <- sprintf('HapMap Phase %d Release %s',
+                    phase, substring(mapping,2))
     if (!nrow(ls.platform(platform))) {
         message("Creating platform '", platform, "'...")
         mk.platform(platform, desc)
     }
-    desc <- sprintf('%s Release %s', desc, f$rel[1])
     if (!nrow(ls.mapping(platform, mapping))) {
         message("Creating mapping '", mapping, "'...")
         mk.mapping(platform, mapping, desc, sprintf('ncbi_%s', f$build[1]))

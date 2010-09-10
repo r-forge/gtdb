@@ -25,7 +25,7 @@
 }
 \usage{
 score.gt.data(formula, pt.data, gt.data, score.fn=NULL,
-              pt.filter=TRUE, gt.filter=TRUE,
+              pt.filter=TRUE, gt.filter=TRUE, dosage=FALSE,
               progress=FALSE, ...)
 }
 \arguments{
@@ -37,6 +37,8 @@ score.gt.data(formula, pt.data, gt.data, score.fn=NULL,
     phenotype table.}
   \item{gt.filter}{an expression to use for subsetting on the
     genotype table.}
+  \item{dosage}{logical: specifies whether to use allele dosage
+    in association tests in place of genotype scores.}
   \item{progress}{logical: specifies if a progress bar should be
     displayed on the R console.}
   \item{\dots}{additional arguments to pass to \code{score.fn}.}

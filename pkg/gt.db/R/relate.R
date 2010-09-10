@@ -112,7 +112,7 @@ function(gt.data, binsz=1e6, min.snps=25, max.snps=50,
     cat("Excluded", sum(last), "of", length(bin.ok), "bins\n");
 
     n <- m0+m1+m2
-    id <- attr(gt.data,'sample.name')
+    id <- sample.names(gt.data)
     dimnames(m1) <- dimnames(m2) <- list(id,id)
     list("IBD=1"=m1/n, "IBD=2"=m2/n)
 }

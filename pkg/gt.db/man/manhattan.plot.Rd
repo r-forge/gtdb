@@ -1,7 +1,7 @@
 %
 % Copyright (C) 2010, 23andMe, Inc.
 % 
-% Written by David A. Hinds <dhinds@sonic.net>
+% Written by David A. Hinds <dhinds@23andMe.com>
 % 
 % This is free software; you can redistribute it and/or modify it
 % under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 \usage{
 manhattan.plot(y, data, gap=0, threshold=-log10(5e-8), around=0,
                xticks=c(1:12,14,16,18,20,22,'X','Y'), cex=0.25,
-               xlab=NULL, ylab=deparse(substitute(y)),
+               xlab=NULL, ylab=deparse(substitute(y)), yrange, ylim,
                col=c('#d0d0d0','#e0e0e0','#ff0000'), ...)
 }
 \arguments{
@@ -38,7 +38,9 @@ manhattan.plot(y, data, gap=0, threshold=-log10(5e-8), around=0,
   \item{around}{in base pairs, specifies that SNPs within this interval
     of a hit should also be highlighted.}
   \item{xticks}{a list of chromosomes to be labeled in the plot.}
-  \item{cex, xlab, ylab}{see \code{\link[lattice:xyplot]{xyplot}}.}
+  \item{cex, xlab, ylab, ylim}{see \code{\link[lattice:xyplot]{xyplot}}.}
+  \item{yrange}{similar to \code{ylim}, except that this range will be
+    padded as if it were the range of actual data points.}
   \item{col}{colors to use for odd and even chromosomes, and hits.}
   \item{\dots}{additional arguments passed to
     \code{\link[lattice:xyplot]{xyplot}}.}
@@ -48,6 +50,10 @@ manhattan.plot(y, data, gap=0, threshold=-log10(5e-8), around=0,
   the source data spans multiple chromosomes, then chromosome names are
   shown along the X axis.  If the data is all on a single chromosome,
   then chromosomal positions are shown.
+
+  The default scaling of the Y axis if neither \code{yrange} or
+  \code{ylim} are specified will place the threshold level at least
+  10% below the upper edge of the plot area.
 }
 \value{
   A plot object of class \code{"trellis"}.

@@ -85,6 +85,50 @@ SEXP do_mask_str(SEXP ss, SEXP sm, SEXP sc)
 
 /*---------------------------------------------------------------------*/
 
+SEXP do_index_str(SEXP ss, SEXP si)
+{
+	int i, j, nc, ns, ni;
+	char *buf;
+    SEXP ans;
+
+	if (!isString(ss))
+		error(_("first argument should be a character vector"));
+	if (!isInteger(si))
+		error(_("second argument should be an integer vector"));
+
+	ns = LENGTH(ss);
+    ni = LENGTH(si);
+	nc = strlen(CHAR(STRING_ELT(ss,0)));
+	for (i = 0; i < ns; i++) {
+		if ((STRING_ELT(ss,i) != NA_STRING) &&
+			(strlen(CHAR(STRING_ELT(ss,i))) != nc))
+			error(_("string length mismatch"));
+	}
+	for (i = 0; i < ni; i++) {
+		if (INTEGER(si)[i] > nc)
+			error(_("index out of range"));
+	}
+
+	PROTECT(ans = allocVector(STRSXP, ns));
+	buf = (char *)R_alloc(ni+1, sizeof(char));
+	buf[ni] = '\0';
+	for (i = 0; i < ns; i++) {
+		if (STRING_ELT(ss,i) == NA_STRING) {
+			SET_STRING_ELT(ans, i, NA_STRING);
+		} else {
+			const char *s = CHAR(STRING_ELT(ss,i));
+			for (j = 0; j < ni; j++) {
+				buf[j] = s[INTEGER(si)[j]-1];
+			}
+			SET_STRING_ELT(ans, i, mkChar(buf));
+		}
+	}
+	UNPROTECT(1);
+	return ans;
+}
+
+/*---------------------------------------------------------------------*/
+
 SEXP do_nsubstr(SEXP ss, SEXP sc)
 {
 	SEXP ans;

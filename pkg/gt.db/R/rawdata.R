@@ -1,7 +1,7 @@
 #
 # Copyright (C) 2010, 23andMe, Inc.
 #
-# Written by David A. Hinds <dhinds@sonic.net>
+# Written by David A. Hinds <dhinds@23andMe.com>
 #
 # This is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
@@ -16,6 +16,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
+
+.unpack.dosage <- function(raw)
+{
+    i <- readBin(raw, what='int', n=length(raw)/2, size=2,
+                 signed=FALSE, endian='little')
+    data.frame(dosage=na.if(i,65535)/1000)
+}
+
+.pack.dosage <- function(data)
+{
+    writeBin(as.integer(if.na(round(1000*data$dosage),65535)),
+             raw(), size=2, endian='little')
+}
 
 #---------------------------------------------------------------------
 
@@ -92,6 +105,8 @@ unpack.raw.data <- function(raw, raw.layout)
         .unpack.seqread(raw)
     } else if (raw.layout == 'chpdata') {
         .unpack.chpdata(raw)
+    } else if (raw.layout == 'dosage') {
+        .unpack.dosage(raw)
     } else {
         stop('unknown raw data layout')
     }
@@ -105,6 +120,8 @@ pack.raw.data <- function(data, raw.layout)
         .pack.seqread(data)
     } else if (raw.layout == 'chpdata') {
         .pack.chpdata(data)
+    } else if (raw.layout == 'dosage') {
+        .pack.dosage(data)
     } else {
         stop('unknown raw data layout')
     }

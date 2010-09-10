@@ -35,12 +35,20 @@ un.mask <- function(s)
 
 mask.str <- function(str, mask, ch='x')
 {
-    .Call('do_mask_str', str, as.mask(mask), ch, PACKAGE='gt.db')
+    s <- .Call('do_mask_str', str, as.mask(mask), ch, PACKAGE='gt.db')
+    structure(s, class=class(str))
+}
+
+index.str <- function(str, pos)
+{
+    s <- .Call('do_index_str', str, as.integer(pos), PACKAGE='gt.db')
+    structure(s, class=class(str))
 }
 
 # fast character-counting functions
 
-nsubstr <- function(a, b) .Call('do_nsubstr', a, b, PACKAGE='gt.db')
+nsubstr <- function(a, b)
+    .Call('do_nsubstr', a, b, PACKAGE='gt.db')
 
 ch.table <- function(s1, s2, chars)
 {

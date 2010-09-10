@@ -210,8 +210,8 @@ function(g1, g2, measure, method, epsilon, max.it)
     if (s == 'A') {
         m <- ch.table(g1$genotype, g2$genotype, c('a','h','b'))
     } else if (s == 'X') {
-        gf <- mask.gt.data(g1, attr(g1,'gender')['F'])
-        gm <- mask.gt.data(g1, attr(g1,'gender')['M'])
+        gf <- mask.gt.data(g1, gender(g1)=='F')
+        gm <- mask.gt.data(g1, gender(g1)=='M')
         m <- (ch.table(gf$genotype, g2$genotype, c('a','h','b')) +
               0.5*ch.table(gm$genotype, g2$genotype, c('a','_','b')))
     } else if (s %in% c('M','Y')) {
@@ -262,7 +262,7 @@ function(g1, g2=g1, outer=TRUE,
 }
 
 .panel.ldplot <-
-    function(x, y, z, at=pretty(z), rug=FALSE, ...,
+    function(x, y, z, at=pretty(z), rug=FALSE, ..., draw=TRUE,
              col.regions=regions$col, alpha.regions=regions$alpha)
 {
     regions <- trellis.par.get("regions")
@@ -287,12 +287,12 @@ function(g1, g2=g1, outer=TRUE,
     idy <- match(y, ux)
     x0 <- (cx[idx]+cx[idy])/2 - (lx[idx]+lx[idy])/2
     xm <- rbind(x0, x0+lx[idy], x0+lx[idx]+lx[idy], x0+lx[idx])
-    y0 <- (max(cy) - (cx[idx]-cx[idy]) + (lx[idx]-lx[idy]))/2
+    y0 <- (max(cx) - (cx[idx]-cx[idy]) + (lx[idx]-lx[idy]))/2
     ym <- rbind(y0, y0+lx[idy], y0+lx[idy]-lx[idx], y0-lx[idx])*2
     gp <- gpar(fill=zcol, lwd=1e-5, col='transparent', alpha=alpha.regions)
     grid.polygon(x=as.vector(xm), y=as.vector(ym),
-                 id.lengths=rep(4,length(x0)),
-                 default.units = "native", gp = gp)
+                 id.lengths=rep(4,length(x0)), gp=gp,
+                 default.units = "native", draw=draw)
 }
 
 ld.plot <-
@@ -330,7 +330,7 @@ function(gt.data, col=gray(seq(1,0,-0.01)), measure='rsqr',
         levelplot(Freq~Var1*Var2, xd, aspect=aspect,
                   col.regions=col, colorkey=colorkey,
                   xlab=NULL, ylab=NULL, scales=scales,
-                  panel.fn=panel.fn, ...)
+                  panel=panel.fn, ...)
     }
 }
 

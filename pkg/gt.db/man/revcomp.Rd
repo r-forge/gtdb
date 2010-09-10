@@ -23,10 +23,12 @@
   Reverse complement DNA sequences, including IUPAC ambiguity codes.
 }
 \usage{
-revcomp(x)
+revcomp(x, ambig=FALSE)
 }
 \arguments{
   \item{x}{a character vector of DNA sequences}
+  \item{ambig}{logical: indicates whether to also complement IUPAC
+    ambiguous nucleotide codes (as opposed to just ACGT).}
 }
 \value{
   A vector with the same shape as \code{x}, where each sequence has been

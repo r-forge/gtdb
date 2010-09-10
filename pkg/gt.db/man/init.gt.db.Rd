@@ -25,7 +25,7 @@
   empty database.
 }
 \usage{
-init.gt.db(db.mode='raw')
+init.gt.db(db.mode=c('raw','hex','zip'))
 }
 \arguments{
   \item{db.mode}{storage mode for packed objects in the database: either

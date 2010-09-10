@@ -25,12 +25,14 @@
   sample.
 }
 \usage{
-unpack.gt.matrix(gt.data, names=gt.data$assay.name, ...)
+unpack.gt.matrix(gt.data, names=gt.data$assay.name, ..., dosage=FALSE)
 }
 \arguments{
   \item{gt.data}{a data frame of genotypes from \code{fetch.gt.data}.}
   \item{names}{column names for the resulting data frame.}
   \item{\dots}{additional arguments passed to \code{\link{gt.split}}.}
+  \item{dosage}{logical: indicates whether to return a matrix of allele
+    dosages instead of genotypes.}
 }
 \value{
   A data frame with one column per row in \code{gt.data}, and one row

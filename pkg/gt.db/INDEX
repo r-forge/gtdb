@@ -1,4 +1,6 @@
 adjust.gt.calls         Manually Assign Genotype Calls
+adjust.ld               Adjust Model to Account for Incomplete Linkage
+                        Disequilibrium
 apply.gt.dataset        Apply a Function to a Genotype Dataset
 apply.loadings          Apply PCA SNP Loadings to a New Genotype Set
 as.mask                 Convert To/From Character Masks
@@ -8,7 +10,11 @@ assay.dat.02            Genotype Data for 371 Chr21 SNPs on 275 HapMap
                         Samples
 big.loadings            Identify Large Sample or SNP Loadings from a
                         PCA Analysis
+cc.model                Case-Control Disease Model Parameters
+cc.power                Power Calculation for Case-Control Association
+                        Studies
 ch.table                Character Based Contingency Table
+draw.tracks             Draw Tracks in Genomic Coordinates
 fetch.gt.data           Load Genotype Data for a Genotyping Dataset
 fetch.prcomp            Load Principal Components Results for a
                         Genotyping Dataset
@@ -48,7 +54,7 @@ ld.gt.data              Compute Pairwise Linkage Disequilibrium
 ld.plot                 Pairwise Linkage Disequilibrium Plot
 ld.prune                Prune SNP List to Limit Linkage Disequilibrium
 load.affy.chp.data      Import Affymetrix CHP Genotype Data
-load.hapmap.data        Import Unphased HapMap Genotype Data
+load.hapmap.data        Import HapMap Genotype Data
 ls.assay                List Assay Definitions
 ls.assay.position       List Assay Positions
 ls.dataset              List Genotype Datasets
@@ -59,6 +65,7 @@ ls.project              List Genotyping Projects
 ls.sample               List Samples in a Genotype Dataset
 ls.subject              List Subjects in a Genotyping Project
 ls.test                 List Association Test Result Sets
+manhattan.plot          Genome-Wide Manhattan Plot
 mask.gt.data            Mask Sample Genotypes
 mask.str                Mask Character Strings
 match.gt.data           Identify Equivalent Genotyping Assays
@@ -94,6 +101,13 @@ progress.bar            Console Text-Based Progress Bar
 qqprcomp                Quantile-Quantile Plots of PCA Loadings
 qqpval                  Quantile-Quantile Plots for P Values
 qqthin                  Sparse Normal Quantile-Quantile Plots
+qtl.cc.power            Power Calculation for QTL Case-Control
+                        Association Studies
+qtl.model               Quantitative Trait Model Parameters
+qtl.power               Power Calculation for Quantitative Trait
+                        Association Studies
+qtl.to.cc               Create Case-Control Model from Quantitative
+                        Trait Tails
 read.affy.anno          Import Affymetrix NetAffx Annotation Data
 reshape.gt.data         Reshape Genotype Data
 revcomp                 Reverse Complement DNA Sequences
@@ -121,6 +135,7 @@ score.prcomp            Test Phenotypic Association with Principal
                         Components
 score.trend             Cochran-Armitage Trend Test for Association
 set.hidden              Update Hidden Status
+setup.tracks            Initialize Track Plot of a Genomic Interval
 snp.loadings            SNP Loadings from Principal Components Analyses
 sql.query               Simplified SQL Statement Execution
 store.prcomp            Store or Remove Principal Components Results

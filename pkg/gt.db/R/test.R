@@ -1,7 +1,8 @@
 #
 # Copyright (C) 2009, Perlegen Sciences, Inc.
+# Copyright (C) 2010, 23andMe, Inc.
 #
-# Written by David A. Hinds <dhinds@sonic.net>
+# Written by David A. Hinds <dhinds@23andMe.com>
 #
 # This is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
@@ -57,7 +58,8 @@
 
 score.gt.data <-
 function(formula, pt.data, gt.data, score.fn=NULL,
-         pt.filter=TRUE, gt.filter=TRUE, progress=FALSE, ...)
+         pt.filter=TRUE, gt.filter=TRUE, dosage=FALSE,
+         progress=FALSE, ...)
 {
     pt.filter <- eval(substitute(pt.filter), pt.data, parent.frame())
     gt.filter <- eval(substitute(gt.filter), gt.data, parent.frame())
@@ -77,7 +79,7 @@ function(formula, pt.data, gt.data, score.fn=NULL,
     if (is.null(score.fn)) {
         binary <- (length(table(pt.data[,col[1]])) == 2)
         groups <- (length(grep(':genotype',dimnames(ft)[[2]])))
-        fn <- if (!groups && binary && (length(col)==2))
+        fn <- if (!groups && binary && !dosage && (length(col)==2))
             'score.trend'
         else paste('score', c('.lm','.glm')[binary+1],
                    c('','.groups')[groups+1], sep='')
@@ -96,7 +98,7 @@ function(formula, pt.data, gt.data, score.fn=NULL,
             my.error(e)
             invokeRestart('muffleWarning')
         }
-        d <- cbind(dsub, unpack.gt.matrix(gn, 'genotype'))
+        d <- cbind(dsub, unpack.gt.matrix(gn, 'genotype', dosage=dosage))
         keep <- if.na(pt.filter,FALSE) & complete.cases(d)
         r <- tryCatch(withCallingHandlers(
             score.fn(formula, d[keep,], gn$ploidy, ...),

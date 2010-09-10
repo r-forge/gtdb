@@ -2,7 +2,7 @@
 # Copyright (C) 2009, Perlegen Sciences, Inc.
 # Copyright (C) 2010, 23andMe, Inc.
 #
-# Written by David A. Hinds <dhinds@sonic.net>
+# Written by David A. Hinds <dhinds@23andMe.com>
 #
 # This is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
@@ -29,16 +29,22 @@ if.na <- function(val,yes,no=val) ifelse(is.na(val),yes,no)
 na.if <- function(v1,v2) ifelse(v1==v2,NA,v1)
 
 rawToHex <- function(raw)
+.Call("raw_to_hex", as.vector(raw), PACKAGE="gt.db")
+
+hexToRaw <- function(hex)
+as.vector(.Call("hex_to_raw", hex[1], PACKAGE="gt.db"))
+
+ramToHex <- function(raw)
 .Call("raw_to_hex", raw, PACKAGE="gt.db")
 
-hexToRaw <- function(hex, drop=TRUE)
-{
-    x <- .Call("hex_to_raw", hex, PACKAGE="gt.db")
-    if (drop && (ncol(x) <= 1))
-        as.vector(x)
-    else
-        x
-}
+hexToRam <- function(hex)
+.Call("hex_to_raw", hex, PACKAGE="gt.db")
+
+ramToChar <- function(raw)
+.Call("raw_to_char", raw, PACKAGE="gt.db")
+
+charToRam <- function(str)
+.Call("char_to_raw", str, PACKAGE="gt.db")
 
 #---------------------------------------------------------------------
 
@@ -57,12 +63,14 @@ hexToRaw <- function(hex, drop=TRUE)
 
 #---------------------------------------------------------------------
 
-revcomp <- function(x)
+revcomp <- function(x, ambig=FALSE)
 {
-    sapply(chartr('ACGTMRWSYKVHDBacgtmrwsykvhdb',
-                  'TGCAKYWSRMBDHVtgcakywsrmbdhv', x),
-           function(s) rawToChar(rev(charToRaw(s))),
-           USE.NAMES=FALSE)
+    if (ambig)
+        x <- chartr('ACGTMRWSYKVHDBacgtmrwsykvhdb',
+                    'TGCAKYWSRMBDHVtgcakywsrmbdhv', x)
+    else
+        x <- chartr('ACGTacgt','TGCAtgca', x)
+    sapply(x, function(s) rawToChar(rev(charToRaw(s))), USE.NAMES=FALSE)
 }
 
 #---------------------------------------------------------------------
@@ -78,8 +86,9 @@ use.gt.db <- function(dbConnection)
     invisible()
 }
 
-init.gt.db <- function(db.mode='raw')
+init.gt.db <- function(db.mode=c('raw','hex','zip'))
 {
+    db.mode <- match.arg(db.mode)
     path <- library(help='gt.db')$path
     schema <- switch(class(gt.db::.gt.db),
                      SQLiteConnection='mk_sqlite.sql',
@@ -98,6 +107,7 @@ init.gt.db <- function(db.mode='raw')
 
 gt.demo.check <- function()
 {
+    prompt <- 'press <return> to create temporary demo database: '
     if (!exists('.gt.db','package:gt.db')) {
         e <- Sys.getenv('GT_DB_DEMO')
         if (e != '') {
@@ -117,7 +127,7 @@ gt.demo.check <- function()
                 db <- dbConnect(dbDriver('Oracle'), s[2], s[3], s[4])
             }
             use.gt.db(db)
-        } else if (!interactive()) {
+        } else if (!interactive() || !is.null(readline(prompt))) {
             require(RSQLite)
             warning("creating in-memory demo database...")
             db <- dbConnect(dbDriver('SQLite'), ':memory:',

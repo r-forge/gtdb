@@ -1,7 +1,8 @@
 #
 # Copyright (C) 2009, Perlegen Sciences, Inc.
+# Copyright (C) 2010, 23andMe, Inc.
 #
-# Written by David A. Hinds <dhinds@sonic.net>
+# Written by David A. Hinds <dhinds@23andMe.com>
 #
 # This is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
@@ -50,7 +51,7 @@ function(formula, data, aggr.fn=max, rescale=FALSE, binsz=1e6,
 manhattan.plot <-
     function(y, data, gap=0, threshold=-log10(5e-8), around=0,
              xticks=c(1:12,14,16,18,20,22,'X','Y'), cex=0.25,
-             xlab=NULL, ylab=deparse(substitute(y)),
+             xlab=NULL, ylab=deparse(substitute(y)), yrange, ylim,
              col=c('#d0d0d0','#e0e0e0','#ff0000'), ...)
 {
     val <- eval(substitute(y), data, parent.frame())
@@ -72,15 +73,24 @@ manhattan.plot <-
     }
     xlim <- range(pos,na.rm=TRUE)
     xlim <- xlim + (xlim[2]-xlim[1]) * c(-0.02,0.02)
-    panel.fn <- function(...) { xyplot(...) ; panel.refline(h=threshold) }
+    if (missing(ylim)) {
+        if (missing(yrange))
+            yrange <- range(c(val,0,1.1*threshold))
+        padding <- lattice.options()$axis.padding$numeric
+        ylim <- yrange + diff(yrange) * padding * c(-1,1)
+    }
+    panel.fn <- function(...)
+    { panel.xyplot(...) ; panel.refline(h=threshold) }
     if (length(len) == 1) {
         set <- list(superpose.symbol=list(col=col[-2]))
         xyplot(val~pos, ..., cex=cex, groups=grp, par.settings=set,
-               panel=panel.fn, xlab=xlab, ylab=ylab, xlim=xlim)
+               panel=panel.fn, xlab=xlab, ylab=ylab,
+               xlim=xlim, ylim=ylim)
     } else {
         w <- match(paste('chr',xticks,sep=''), names(len))
         xyplot(val~pos, ..., cex=cex, groups=grp, par.settings=set,
                scales=list(x=list(at=mid[w],tck=0,labels=xticks)),
-               panel=panel.fn, xlab=xlab, ylab=ylab, xlim=xlim)
+               panel=panel.fn, xlab=xlab, ylab=ylab,
+               xlim=xlim, ylim=ylim)
     }
 }

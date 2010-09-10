@@ -48,8 +48,8 @@ nw.orient.assay <- function(gt1, gt2, delta=1)
     r2 <- sub('.*_(.*)', '\\1', gt2)
     rhs <- c(FALSE,TRUE,FALSE,TRUE)
     fwd <- (nw.score(l1,l2,ends=!rhs) + nw.score(r1,r2,ends=rhs))
-    rev <- (nw.score(l1,revcomp(r2),ends=!rhs) +
-            nw.score(r1,revcomp(l2),ends=rhs))
+    rev <- (nw.score(l1,revcomp(r2,TRUE),ends=!rhs) +
+            nw.score(r1,revcomp(l2,TRUE),ends=rhs))
     f <- ifelse(fwd>rev+delta, '+', ifelse(rev>fwd+delta, '-', NA))
     factor(f, levels=c('+','-'))
 }

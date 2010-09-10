@@ -65,7 +65,7 @@
 gt.demo.check()
 g <- fetch.gt.data('Demo_1')[1:10,]
 summary(g)
-summary(g, attr(g,'gender')[['F']])
+summary(g, gender(g)=='F')
 summary(g, by.sample=TRUE)[1:10,]
 }
 \keyword{manip}
