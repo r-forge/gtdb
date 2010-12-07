@@ -170,6 +170,9 @@ function(formula, data, ploidy, drop='genotype',
          mode=c('additive','recessive','dominant','general'))
 {
     data$genotype <- .recode.gt(data$genotype, match.arg(mode))
+    lhs <- .lhs.formula(formula)
+    if (lhs %in% names(data) && is.factor(data[,lhs]))
+        data[,lhs] <- as.numeric(data[,lhs])
     m <- lm(formula, data)
     nf <- .null.model(formula, term=drop)
     pvalue <- anova(update(m,nf), m)[2,6]
@@ -187,6 +190,9 @@ score.lm.general <- function(formula, data, ploidy)
         return(keep.attr(cbind(term=NA, r), fit='lm'))
     }
     data$genotype <- factor(data$genotype)
+    lhs <- .lhs.formula(formula)
+    if (lhs %in% names(data) && is.factor(data[,lhs]))
+        data[,lhs] <- as.numeric(data[,lhs])
     contrasts <- list(genotype=matrix(c(0,1,2,0,1,0),3,2))
     m <- lm(formula, data, contrasts=contrasts)
     nf <- .null.model(formula)
@@ -248,6 +254,16 @@ function(formula, data, ploidy, drop='genotype', test=c('LR','Wald','Rao'),
     keep.attr(data.frame(
         pvalue, effect=x[1], stderr=x[2]
     ), fit='glm')
+}
+
+score.glm.scoretest <-
+    function (formula, data, ploidy,
+              precalc=glm(.null.model(formula),binomial,data))
+{
+    require(statmod)
+    pvalue <- 2 * pnorm(-abs(glm.scoretest(precalc,data$genotype)))
+    keep.attr(data.frame(pvalue, effect = NA, stderr = NA),
+              fit = "glm.scoretest")
 }
 
 score.glm.general <- function(formula, data, ploidy)
@@ -348,3 +364,52 @@ score.gls.groups <- function(formula, data, ploidy, ...)
     ), fit='gls')
 }
 
+#-----------------------------------------------------------------------
+
+score.coxph <-
+function(formula, data, ploidy, test=c('LR','Wald'),
+         mode=c('additive','recessive','dominant','general'), ...)
+{
+    lhs <- .lhs.formula(formula)
+    if (!is.Surv(data[,lhs]))
+        data[,lhs] <- Surv(abs(data[,lhs]),data[,lhs]>0)
+    data$genotype <- .recode.gt(data$genotype, match.arg(mode))
+    m <- coxph(formula, data, ...)
+    x <- unname(coef(summary(m))['genotype',])
+    test <- match.arg(test)
+    if (test == "LR") {
+        # work-around for anova() evaluation problems
+        LL <- function(m) tail(m$loglik,1)
+        m0 <- update(m, .null.model(formula, term='genotype'))
+        pvalue <- pchisq(2*(LL(m)-LL(m0)), 1, lower=FALSE)
+    } else {
+        pvalue <- pnorm(-abs(x[4]))*2
+    }
+    keep.attr(data.frame(
+        pvalue, effect=x[1], stderr=x[3]
+    ), fit='coxph')
+}
+
+score.survreg <-
+function(formula, data, ploidy, test=c('LR','Wald'),
+         mode=c('additive','recessive','dominant','general'), ...)
+{
+    lhs <- .lhs.formula(formula)
+    if (!is.Surv(data[,lhs]))
+        data[,lhs] <- Surv(abs(data[,lhs]),data[,lhs]>0)
+    data$genotype <- .recode.gt(data$genotype, match.arg(mode))
+    m <- survreg(formula, data, ...)
+    x <- unname(summary(m)$table['genotype',])
+    test <- match.arg(test)
+    if (test == "LR") {
+        # work-around for anova() evaluation problems
+        LL <- function(m) tail(m$loglik,1)
+        m0 <- update(m, .null.model(formula, term='genotype'))
+        pvalue <- pchisq(2*(LL(m)-LL(m0)), 1, lower=FALSE)
+    } else {
+        pvalue <- x[4]
+    }
+    keep.attr(data.frame(
+        pvalue, effect=x[1], stderr=x[2]
+    ), fit='survreg')
+}

@@ -26,7 +26,8 @@
 \usage{
 manhattan.plot(y, data, gap=0, threshold=-log10(5e-8), around=0,
                xticks=c(1:12,14,16,18,20,22,'X','Y'), cex=0.25,
-               xlab=NULL, ylab=deparse(substitute(y)), yrange, ylim,
+               xlab=, ylab=expression(-log[10](pvalue)), yrange, ylim,
+               scale=c('Mb','Kb','bp'),
                col=c('#d0d0d0','#e0e0e0','#ff0000'), ...)
 }
 \arguments{
@@ -41,6 +42,8 @@ manhattan.plot(y, data, gap=0, threshold=-log10(5e-8), around=0,
   \item{cex, xlab, ylab, ylim}{see \code{\link[lattice:xyplot]{xyplot}}.}
   \item{yrange}{similar to \code{ylim}, except that this range will be
     padded as if it were the range of actual data points.}
+  \item{scale}{determines the scaling of tick labels on the X axis, if
+    the data all falls on a single chromosome.}
   \item{col}{colors to use for odd and even chromosomes, and hits.}
   \item{\dots}{additional arguments passed to
     \code{\link[lattice:xyplot]{xyplot}}.}

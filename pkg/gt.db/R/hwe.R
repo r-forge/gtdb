@@ -23,38 +23,29 @@
 
 .hwe.exact <- function(aa, ab, bb, tail)
 {
-    # use integer constants to avoid implicit casts
-    m  <- ab %/% 2L
-    xx <- aa + m + 1L
-    xy <- ab %% 2L + 1L
-    yy <- bb + m + 1L
-    n  <- pmin(xx,yy) - 1L
+    nr <- pmin(aa,bb)*2+ab
+    nn <- aa+ab+bb
+    xy <- as.integer(nr*(2*nn-nr) / (2*nn))
+    xy <- xy + ((nr+xy) %% 2)
+    xx <- (nr-xy) %/% 2
+    yy <- (nn-xy-xx)
 
-    # precompute lookup table of log gamma values
-    # note that xx, xy, yy are offset by 1 for indexing
-    LG <- lgamma(1:(max(xx,yy,2L*n)+2))
-    v <- log(2)*ab - LG[aa+1L] - LG[ab+1L] - LG[bb+1L]
-    log.p <- function(xx, xy, yy, i)
-        log(2)*(xy+2L*i-1L) - LG[xx-i] - LG[xy+2L*i] - LG[yy-i]
-
-    fn.lower <- function(v, m, n, ...)
+    p.fn <- function(xx, xy, yy)
     {
-        p <- exp(log.p(...,0:n)-v)
-        sum(p[0:m+1L])/sum(p)
-    }
-    fn.upper <- function(v, m, n, ...)
-    {
-        p <- exp(log.p(...,0:n)-v)
-        sum(p[m:n+1L])/sum(p)
-    }
-    fn.both <- function(v, m, n, ...)
-    {
-        p <- exp(log.p(...,0:n)-v)
-        sum(p[p<=1])/sum(p)
+        if (is.na(xx+xy+yy)) return(NA)
+        i <- 1:(xy %/% 2)
+        lt <- cumprod((xy-2*i+2)*(xy-2*i+1)/(4*(xx+i)*(yy+i)))
+        i <- 1:min(xx,yy)
+        ut <- cumprod(4*(xx-i+1)*(yy-i+1)/((xy+2*i)*(xy+2*i-1)))
+        c(rev(lt),1,ut)
     }
 
-    mapply(switch(tail, lower=fn.lower, upper=fn.upper, fn.both),
-           v, m, n, xx, xy, yy)
+    fn.lower <- function(brk, p) sum(p[1:brk]) / sum(p)
+    fn.upper <- function(brk, p) sum(p[brk:length(p)]) / sum(p)
+    fn.both  <- function(brk, p) sum(p[p <= p[brk]]) / sum(p)
+    fn <- switch(tail, lower=fn.lower, upper=fn.upper, fn.both)
+    mapply(function(brk,xx,xy,yy) fn(brk, p.fn(xx,xy,yy)),
+           (ab %/% 2)+1, xx, xy, yy)
 }
 
 hwe.test <-

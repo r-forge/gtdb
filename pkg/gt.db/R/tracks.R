@@ -31,18 +31,19 @@ draw.tracks <- function(tracks, scale=c('Mb','Kb','bp'), xlab)
     tck <- function(x) { p <- pretty(x) ; p[p >= x[1] & p <= x[2]] }
     xscale <- current.viewport()$xscale
     scale <- match.arg(scale)
-    mul <- switch(match.arg(scale), Mb=1e6, Kb=1e3, 1)
-    grid.xaxis(tck(xscale), format(tck(xscale/mul)))
+    div <- switch(scale, Mb=1e6, Kb=1e3, 1)
+    grid.xaxis(tck(xscale), format(tck(xscale/div)))
     if (missing(xlab))
         xlab <- paste(gt$scaffold[1], 'position,', scale)
     if (!is.null(xlab))
         grid.text(xlab, y=unit(-3,'lines'))
     y <- unit(0,'npc')
     for (tn in 1:length(tracks)) {
+        tr <- tracks[[tn]]
+        if (is.null(tr)) next
         name <- names(tracks)[tn]
         if (is.null(name) || name=='')
             name <- sprintf("track%d", tn)
-        tr <- tracks[[tn]]
         args <- list(name=name, y=y, just='bottom', xscale=xscale)
         vp <- do.call('viewport', c(args, tr$vp))
         pushViewport(vp)
@@ -55,7 +56,7 @@ draw.tracks <- function(tracks, scale=c('Mb','Kb','bp'), xlab)
     }
     pushViewport(viewport(name='border', y=unit(0,'npc'),
                           height=y, just='bottom'))
-    grid.rect()
+    grid.rect(gp=gpar(fill='transparent'))
     upViewport()
 }
 

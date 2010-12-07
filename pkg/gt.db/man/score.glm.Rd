@@ -1,7 +1,8 @@
 %
 % Copyright (C) 2009, Perlegen Sciences, Inc.
+% Copyright (C) 2010, 23andMe, Inc.
 % 
-% Written by David A. Hinds <dhinds@sonic.net>
+% Written by David A. Hinds <dhinds@23andMe.com>
 % 
 % This is free software; you can redistribute it and/or modify it
 % under the terms of the GNU General Public License as published by
@@ -51,16 +52,17 @@ score.glm(formula, data, ploidy, drop='genotype',
 \value{
   A data frame with one row and three columns.  An effect size is not
   reported if the mode of action is \code{'general'}.
-  \item{pvalue}{P value for an F test comparing the full and null models.}
+  \item{pvalue}{P value for the specified \code{test}.}
   \item{effect}{the regression coefficient (log odds) for \code{term}.}
   \item{stderr}{the standard error of the effect size estimate.}
 }
 \seealso{
-  \code{\link{lm}},
+  \code{\link{glm}},
   \code{\link{score.trend}},
   \code{\link{score.chisq}},
   \code{\link{score.glm.general}},
   \code{\link{score.glm.groups}},
+  \code{\link{score.glm.scoretest}},
   \code{\link{score.gt.data}}.
 }
 \examples{

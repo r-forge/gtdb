@@ -51,33 +51,42 @@ function(formula, data, aggr.fn=max, rescale=FALSE, binsz=1e6,
 manhattan.plot <-
     function(y, data, gap=0, threshold=-log10(5e-8), around=0,
              xticks=c(1:12,14,16,18,20,22,'X','Y'), cex=0.25,
-             xlab=NULL, ylab=deparse(substitute(y)), yrange, ylim,
+             xlab, ylab=expression(-log[10](pvalue)), yrange, ylim,
+             scale=c('Mb','Kb','bp'),
              col=c('#d0d0d0','#e0e0e0','#ff0000'), ...)
 {
     val <- eval(substitute(y), data, parent.frame())
-    len <- with(data, tapply(position, .sort.levels(scaffold),
+    scale <- match.arg(scale)
+    div <- switch(scale, Mb=1e6, Kb=1000, 1)
+    len <- with(data, tapply(position/div, .sort.levels(scaffold),
                              max, na.rm=TRUE))
     ofs <- cumsum(c(0,as.numeric(len+gap)))
     mid <- (ofs[-1] + ofs[-length(ofs)])/2
-    pos <- data$position + ofs[match(data$scaffold, names(len))]
+    pos <- data$position/div + ofs[match(data$scaffold, names(len))]
     set <- list(superpose.symbol=list(col=col))
     grp <- (match(data$scaffold, names(len)) %% 2)
     grp <- ifelse(val > threshold, 2, grp)
     if (around > 0) {
         hits <- pos[which(val > threshold)]
-        keep <- (diff(hits) > around)
+        keep <- (diff(hits) > around/div)
         hits <- hits[c(TRUE,keep) | c(keep,TRUE)]
         for (hit in hits) {
-            grp[abs(pos - hit) < around] <- 2
+            grp[abs(pos - hit) < around/div] <- 2
         }
     }
     xlim <- range(pos,na.rm=TRUE)
     xlim <- xlim + (xlim[2]-xlim[1]) * c(-0.02,0.02)
     if (missing(ylim)) {
         if (missing(yrange))
-            yrange <- range(c(val,0,1.1*threshold))
+            yrange <- range(c(val,0,1.1*threshold), na.rm=TRUE)
         padding <- lattice.options()$axis.padding$numeric
         ylim <- yrange + diff(yrange) * padding * c(-1,1)
+    }
+    if (missing(xlab)) {
+        if (length(len) == 1)
+            xlab <- paste('position,', scale)
+        else
+            xlab <- 'Chromosome'
     }
     panel.fn <- function(...)
     { panel.xyplot(...) ; panel.refline(h=threshold) }

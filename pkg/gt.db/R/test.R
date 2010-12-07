@@ -27,14 +27,23 @@
 
 .null.model <- function(formula, term='genotype')
 {
-    txt <- gsub(paste('[*+:]',term), '', .as.text(formula))
-    eval(parse(text=gsub(term, '1', txt)))
+    drop <- grep(paste('\\b',term,'\\b',sep=''),
+                 labels(terms(formula)), value=TRUE)
+    if (length(drop) == 0)
+        stop('no term(s) to drop')
+    drop <- paste('~ . -', paste(drop,collapse=' - '))
+    update.formula(formula, as.formula(drop))
 }
 
 .flat.model <- function(formula, term='genotype')
 {
-    txt <- .as.text(.null.model(formula, term))
-    eval(parse(text=paste(txt, '+', term)))
+    drop <- grep(paste('\\b',term,'\\b',sep=''),
+                 labels(terms(formula)), value=TRUE)
+    drop <- setdiff(drop, term)
+    if (length(drop) == 0)
+        stop('no term(s) to drop')
+    drop <- paste('~ . -', paste(drop,collapse=' - '))
+    update.formula(formula, as.formula(drop))
 }
 
 .lhs.formula <- function(formula) as.character(formula[2])
@@ -76,10 +85,14 @@ function(formula, pt.data, gt.data, score.fn=NULL,
         dsub$gender <- pt.data$gender
 
     # guess scoring function based on model and outcome
+    if (is.character(score.fn))
+        score.fn <- eval(parse(text=paste('score.', score.fn, sep='')))
     if (is.null(score.fn)) {
         binary <- (length(table(pt.data[,col[1]])) == 2)
         groups <- (length(grep(':genotype',dimnames(ft)[[2]])))
-        fn <- if (!groups && binary && !dosage && (length(col)==2))
+        fn <- if (is.Surv(pt.data[,col[1]]))
+            'score.coxph'
+        else if (!groups && binary && !dosage && (length(col)==2))
             'score.trend'
         else paste('score', c('.lm','.glm')[binary+1],
                    c('','.groups')[groups+1], sep='')
@@ -87,7 +100,18 @@ function(formula, pt.data, gt.data, score.fn=NULL,
         score.fn <- eval(parse(text=fn))
     }
 
+    pt.mask <- if.na(pt.filter,FALSE) & complete.cases(dsub)
+    dsub <- dsub[pt.mask,,drop=FALSE]
+
+    # if score function has a precalc argument, evaluate it now
+    precalc <- eval(formals(score.fn)$precalc,
+                    envir=list(formula=formula, data=dsub))
+    new.score.fn <- score.fn
+    if (!is.null(precalc))
+        new.score.fn <- function(...) score.fn(..., precalc=precalc)
+    id.cols <- which(names(gt.data) %in% c('assay.data.id','assay.name'))
     nr <- nrow(gt.data)
+
     wrap.score.fn <- function(n) {
         gn <- gt.data[n,]
         my.error <- function(e) {
@@ -98,15 +122,19 @@ function(formula, pt.data, gt.data, score.fn=NULL,
             my.error(e)
             invokeRestart('muffleWarning')
         }
-        d <- cbind(dsub, unpack.gt.matrix(gn, 'genotype', dosage=dosage))
-        keep <- if.na(pt.filter,FALSE) & complete.cases(d)
+        dsub$genotype <- unpack.gt.matrix(gn, dosage=dosage)[pt.mask,1]
+        if (!is.null(precalc)) {
+            dsub$genotype <- if.na(dsub$genotype,
+                                   mean(dsub$genotype,na.rm=TRUE))
+            keep <- TRUE
+        } else
+            keep <- !is.na(dsub$genotype)
         r <- tryCatch(withCallingHandlers(
-            score.fn(formula, d[keep,], gn$ploidy, ...),
+            new.score.fn(formula, dsub[keep,], gn$ploidy, ...),
             warning=my.warn), error=my.error)
         if (progress) progress.bar(n, nr)
         if (!is.null(r)) {
-            id <- gn[c('assay.data.id','assay.name')]
-            keep.attr(merge(id,r), .Attr=kept.attr(r))
+            keep.attr(cbind(gn[id.cols],r), .Attr=kept.attr(r))
         }
     }
     if (progress) progress.bar(0, nr)

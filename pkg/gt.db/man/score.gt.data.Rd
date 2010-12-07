@@ -32,7 +32,8 @@ score.gt.data(formula, pt.data, gt.data, score.fn=NULL,
   \item{formula}{a symbolic description of the model to be fit.}
   \item{pt.data}{a data frame of phenotypes from \code{\link{fetch.pt.data}}.}
   \item{gt.data}{a data frame of genotypes from \code{\link{fetch.gt.data}}.}
-  \item{score.fn}{the scoring function to be applied to each SNP.}
+  \item{score.fn}{the scoring function to be applied to each SNP, or a
+    short name like \code{'lm'}, \code{'glm'}, etc.}
   \item{pt.filter}{an expression to use for subsetting on the
     phenotype table.}
   \item{gt.filter}{an expression to use for subsetting on the
@@ -53,8 +54,8 @@ score.gt.data(formula, pt.data, gt.data, score.fn=NULL,
   the form of the model formula.  A trend test will be used for simple
   binary-outcome models of the form "status~genotype".  Logistic
   regression will be used for binary outcomes with more complicated
-  model functions.  And linear regression will be used for
-  quantitative outcomes.
+  model functions.  Cox proportional hazards will be used for a survival
+  outcome.  And linear regression will be used for quantitative outcomes.
 
   The filters \code{pt.filter} and \code{gt.filter} are evaluated
   in the context of the \code{pt.data} and \code{gt.data} tables,
@@ -89,6 +90,8 @@ score.gt.data(formula, pt.data, gt.data, score.fn=NULL,
   \code{\link{score.glm}},
   \code{\link{score.glm.general}},
   \code{\link{score.glm.groups}},
+  \code{\link{score.coxph}},
+  \code{\link{score.survreg}},
   \code{\link{score.and.store}}.
 }
 \examples{

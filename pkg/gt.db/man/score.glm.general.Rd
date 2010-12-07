@@ -45,7 +45,7 @@ score.glm.general(formula, data, ploidy)
   the second describes the fitted additive effect; and the third
   describes the fitted dominance effect.
   \item{term}{\code{NA}, \code{'additive'}, or \code{'dominance'}.}
-  \item{pvalue}{For the overall test, the ANOVA F test result.
+  \item{pvalue}{For the overall test, the ANOVA test result.
     For additive and dominance effects, Wald test results.}
   \item{effect}{the regression coefficient, for the additive or
     dominant effect.}

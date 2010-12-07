@@ -7,6 +7,6 @@ Maintainer: David Hinds <dhinds@sonic.net>
 Description: Framework for storing and manipulating genotype data, 
   phenotype data, and association study results
 License: GPL
-Depends: R (>= 2.7.0), lattice, grid, methods, DBI
-Suggests: nlme, cluster, mda, RMySQL, RSQLite
+Depends: R (>= 2.7.0), survival, lattice, grid, methods, DBI
+Suggests: statmod, nlme, cluster, mda, RMySQL, RSQLite
 Packaged: 2010-08-12 20:47:05 UTC; dhinds

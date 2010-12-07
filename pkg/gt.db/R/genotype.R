@@ -202,7 +202,7 @@ function(gt.data, names=gt.data$assay.name, ..., dosage=FALSE)
     }
     if (dosage) {
         fn <- function(x) unpack.raw.data(hexToRaw(x),'dosage')$dosage
-        g <- lapply(gt.data$raw.data)
+        g <- lapply(gt.data$raw.data, fn)
     } else {
         a <- strsplit(gt.data$alleles, split='/', fixed=TRUE)
         g <- mapply(gt.split, gt.data$genotype, ...,
